@@ -242,6 +242,7 @@ for (const keep of [true, false]) test(`early finish asks and ${keep ? 'saves' :
   }, key);
   await page.clock.install();
   await page.goto('/');
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
   await page.getByRole('button', { name: 'Finalizar meditación', exact: true }).click();
   await expect(page.getByRole('heading', { name: '¿Guardar esta meditación?' })).toBeVisible();
   const before = await page.evaluate(k => JSON.parse(localStorage.getItem(k)!), key);
@@ -264,6 +265,7 @@ test('cancel early finish keeps paused session and completion saves without aski
   await page.goto('/');
   await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
   await page.clock.fastForward(10000);
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
   await page.getByRole('button', { name: 'Finalizar meditación', exact: true }).click();
   await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
   await expect(page.getByText('EN PAUSA', { exact: true })).toBeVisible();
@@ -305,6 +307,7 @@ test('a new meditation resets the orbit after finishing an earlier session', asy
   });
   await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
   await expect.poll(angle).toBeGreaterThan(25);
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
   await page.getByRole('button', { name: 'Finalizar meditación', exact: true }).click();
   await expect(page.getByRole('heading', { name: '¿Guardar esta meditación?' })).toBeVisible();
   await expect.poll(angle).toBe(0);
@@ -374,4 +377,186 @@ test('deleting one journal entry requires confirmation, updates totals and persi
   await expect(page.getByText('No hay meditaciones este día', { exact: true })).toBeVisible();
   await expect(page.getByTestId('calendar-minutes')).toHaveText(['<1 min']);
   await expect(page.getByTestId('history-count')).toHaveText('Sesiones: 1');
+});
+test('background sound steps both ways, wraps around, and persists', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  // Record every playback attempt: choosing a sound must not make any.
+  await page.addInitScript(() => {
+    (window as unknown as { plays: string[] }).plays = [];
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      (window as unknown as { plays: string[] }).plays.push(this.src);
+      return play.apply(this);
+    };
+  });
+  await page.goto('/');
+  const label = page.getByTestId('ambience-label');
+  const next = page.getByTestId('ambience-forward');
+  await expect(label).toHaveText('Sin sonido de fondo');
+  await next.click();
+  await expect(label).toHaveText('Lluvia suave');
+  await next.click();
+  await expect(label).toHaveText('Olas del mar');
+  await next.click();
+  await expect(label).toHaveText('Sin sonido de fondo');
+  await page.getByTestId('ambience-back').click();
+  await expect(label).toHaveText('Olas del mar');
+  await page.reload();
+  await expect(label).toHaveText('Olas del mar');
+  const data = await page.evaluate(k => JSON.parse(localStorage.getItem(k)!), key);
+  expect(data.settings.ambience).toBe('waves');
+  await expect(page.getByTestId('countdown')).toHaveText('20:00');
+  const plays = () => page.evaluate(() => (window as unknown as { plays: string[] }).plays.length);
+  expect(await plays()).toBe(0);
+  expect(errors).toEqual([]);
+});
+test('background sound plays only while the timer is running', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.addInitScript(() => {
+    (window as unknown as { plays: string[] }).plays = [];
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      (window as unknown as { plays: string[] }).plays.push(this.src);
+      return play.apply(this);
+    };
+  });
+  await page.goto('/');
+  await page.getByTestId('ambience-forward').click();
+  await expect(page.getByTestId('ambience-label')).toHaveText('Lluvia suave');
+  const plays = () => page.evaluate(() => (window as unknown as { plays: string[] }).plays.length);
+  expect(await plays()).toBe(0);
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await expect.poll(plays, { timeout: 4000 }).toBeGreaterThan(0);
+  // Switching mid-session hands over without a second start of the outgoing track.
+  await page.getByTestId('ambience-forward').click();
+  await expect(page.getByTestId('ambience-label')).toHaveText('Olas del mar');
+  await expect.poll(plays, { timeout: 4000 }).toBe(2);
+  await page.waitForTimeout(2500);
+  expect(await plays()).toBe(2);
+  expect(errors).toEqual([]);
+});
+test('background sound uses the gong volume setting', async ({ page }) => {
+  await page.addInitScript(k => {
+    localStorage.setItem(k, JSON.stringify({ settings: { minutes: 20, ambience: 'rain', volume: .3, gong: false } }));
+    const media: HTMLMediaElement[] = [];
+    (window as unknown as { media: HTMLMediaElement[] }).media = media;
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () { media.push(this); return play.apply(this); };
+  }, key);
+  await page.goto('/');
+  await expect(page.getByTestId('ambience-label')).toHaveText('Lluvia suave');
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  const loudest = () => page.evaluate(() =>
+    Math.max(0, ...(window as unknown as { media: HTMLMediaElement[] }).media.map(m => m.volume)));
+  // Fades up to the configured level and stops there, rather than a level of its own.
+  await expect.poll(loudest, { timeout: 4000 }).toBeGreaterThan(.28);
+  await page.waitForTimeout(1200);
+  expect(await loudest()).toBeLessThanOrEqual(.31);
+});
+test('a volume of zero keeps the background sound silent', async ({ page }) => {
+  await page.addInitScript(k => {
+    localStorage.setItem(k, JSON.stringify({ settings: { minutes: 20, ambience: 'waves', volume: 0, gong: false } }));
+    (window as unknown as { plays: number }).plays = 0;
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () { (window as unknown as { plays: number }).plays++; return play.apply(this); };
+  }, key);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await page.waitForTimeout(2000);
+  expect(await page.evaluate(() => (window as unknown as { plays: number }).plays)).toBe(0);
+});
+const spySources = () => {
+  const spy = window as unknown as { sources: string[]; media: HTMLMediaElement[] };
+  spy.sources = []; spy.media = [];
+  const play = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function () {
+    spy.sources.push(this.src); spy.media.push(this);
+    return play.apply(this);
+  };
+};
+test('an opening gong holds the ambience back until it is nearly over', async ({ page }) => {
+  await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({
+    settings: { minutes: 20, ambience: 'rain', volume: .5, gongStart: true, gong: false },
+  })), key);
+  await page.addInitScript(spySources);
+  await page.goto('/');
+  // Ambience keeps its asset path in the URL; the bundled gong is served from a blob.
+  const started = (name: string) => page.evaluate(n =>
+    (window as unknown as { sources: string[] }).sources.filter(s => s.includes(n)).length, name);
+  const gongs = () => page.evaluate(() =>
+    (window as unknown as { sources: string[] }).sources.filter(s => s.startsWith('blob:')).length);
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await expect.poll(gongs, { timeout: 5000 }).toBeGreaterThan(0);
+  await page.waitForTimeout(3000);
+  expect(await started('rain'), 'the ambience must not land on top of the gong').toBe(0);
+
+});
+test('without an opening gong the ambience starts at once', async ({ page }) => {
+  await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({
+    settings: { minutes: 20, ambience: 'rain', volume: .5, gongStart: false, gong: false },
+  })), key);
+  await page.addInitScript(spySources);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await expect.poll(() => page.evaluate(() =>
+    (window as unknown as { sources: string[] }).sources.filter(s => s.includes('rain')).length),
+    { timeout: 4000 }).toBeGreaterThan(0);
+});
+test('the ambience fades out as the closing gong rings', async ({ page }) => {
+  await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({
+    settings: { minutes: 1, ambience: 'waves', volume: .5, gong: true, gongStart: false },
+    timer: { status: 'running', durationMs: 60000, remainingMs: 4000, endsAt: Date.now() + 4000 },
+  })), key);
+  await page.addInitScript(spySources);
+  await page.goto('/');
+  const ambience = () => page.evaluate(() =>
+    (window as unknown as { sources: string[] }).sources.filter(s => s.includes('waves')).length);
+  const gongs = () => page.evaluate(() =>
+    (window as unknown as { sources: string[] }).sources.filter(s => s.startsWith('blob:')).length);
+  const loudest = () => page.evaluate(() => Math.max(0, ...(window as unknown as { media: HTMLMediaElement[] }).media
+    .filter(m => m.src.includes('waves')).map(m => m.volume)));
+  await expect.poll(ambience, { timeout: 5000 }).toBeGreaterThan(0);
+  await expect.poll(loudest, { timeout: 5000 }).toBeGreaterThan(.1);
+  await expect(page.getByText('SESIÓN COMPLETADA', { exact: true })).toBeVisible({ timeout: 15000 });
+  await expect.poll(gongs, { timeout: 8000 }).toBeGreaterThan(0);
+  // The closing gong rings over an ambience already on its way out, never over a full one.
+  await expect.poll(loudest, { timeout: 5000 }).toBe(0);
+});
+test('an unknown stored ambience falls back to silence', async ({ page }) => {
+  await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({
+    settings: { minutes: 20, ambience: 'thunder' },
+  })), key);
+  await page.goto('/');
+  await expect(page.getByTestId('ambience-label')).toHaveText('Sin sonido de fondo');
+});
+test('a running session offers only pause, and finishing goes through it', async ({ page }) => {
+  await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({ settings: { minutes: 20, gong: false } })), key);
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Finalizar meditación' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Pausar meditación', exact: true })).toBeVisible();
+  // Ending a meditation is not a one-tap action taken with your eyes closed.
+  await expect(page.getByRole('button', { name: 'Finalizar meditación' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Finalizar meditación' })).toBeVisible();
+});
+test('landscape keeps the start button and the controls on screen', async ({ page }) => {
+  await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({ settings: { minutes: 20, gong: false } })), key);
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto('/');
+  const viewport = page.viewportSize()!;
+  // A short screen lays the halo beside the controls; nothing may fall below the fold.
+  for (const name of ['Iniciar meditación', 'Abrir ajustes']) {
+    const box = await page.getByRole('button', { name, exact: true }).boundingBox();
+    expect(box, name).not.toBeNull();
+    expect(box!.y + box!.height, `${name} is cut off`).toBeLessThanOrEqual(viewport.height);
+  }
+  const label = await page.getByTestId('ambience-label').boundingBox();
+  expect(label!.y + label!.height).toBeLessThanOrEqual(viewport.height);
+  // The halo must not sit under the readout: the two columns are side by side.
+  const halo = await page.getByTestId('meditation-halo').boundingBox();
+  const countdown = await page.getByTestId('countdown').boundingBox();
+  expect(halo!.x + halo!.width, 'columns overlap').toBeLessThanOrEqual(countdown!.x);
 });

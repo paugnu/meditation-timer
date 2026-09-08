@@ -21,7 +21,6 @@
   "Suena al completar el tiempo elegido.": "Plays when the chosen time is complete.",
   "Gong de meditación · Marble Toast (CC0).": "Meditation gong · Marble Toast (CC0).",
   "Volumen": "Volume",
-  "Volumen del gong": "Gong volume",
   "{n} por ciento": "{n} percent",
   "Escuchar gong": "Listen to gong",
   "Preparando gong…": "Preparing gong…",
@@ -110,5 +109,15 @@
   "Eliminar definitivamente": "Delete permanently",
   "¿Eliminar esta meditación? Se descontará del tiempo meditado. Esta acción no se puede deshacer.": "Delete this meditation? It will be deducted from your meditation time. This cannot be undone.",
   "Política de privacidad": "Privacy policy",
-  "Ayuda y contacto": "Help and contact"
+  "Ayuda y contacto": "Help and contact",
+  "Sonido de fondo": "Background sound",
+  "Sin sonido de fondo": "No background sound",
+  "Lluvia suave": "Soft rain",
+  "Olas del mar": "Ocean waves",
+  "No se ha podido reproducir el sonido de fondo.": "The background sound could not be played.",
+  "SONIDO DE FONDO": "BACKGROUND SOUND",
+  "Se aplica al gong y al sonido de fondo.": "Applies to both the gong and the background sound.",
+  "Sin permiso de avisos, el gong solo suena con la app abierta.": "Without notification permission the gong only sounds while the app is open.",
+  "Permitir avisos": "Allow notifications",
+  "Pidiendo permiso…": "Asking for permission…"
 }

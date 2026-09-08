@@ -171,3 +171,42 @@ Google rejected the initial Android public submission for a store listing/name m
 - Sent all 11 changes to Google Play. Console confirms **Cambios en revisión** for build 8, with preliminary checks still running. This is a submission, not approval/public availability.
 - iOS build 8 uploaded successfully through EAS Submit, submission `e152f10c-0682-4235-a3c0-6a1969c74734`. Success log: `/tmp/name-ios-submit.log`.
 - Apple browser session expired. Asked Pau to sign in again. Still pending: confirm Apple processing, select build 8 for public review, update store screenshots that show the previous title, and submit the corrected version. Do not interpret the EAS upload as an App Review submission. Last confirmed public iOS submission was build 7; its current review status has not been verified.
+
+## 1.2.0 (9) — 8 de septiembre de 2026 · pendiente de compilar
+
+Cambios de producto posteriores a la build 8, ninguno distribuido todavía.
+
+- Cabecera eliminada: la pantalla principal ya no muestra el nombre de la app. `expo.name` y el
+  nombre del lanzador siguen siendo `Meditation Timer · YogaBond`, que es lo que Google comparaba.
+- Sonido de fondo en bucle con fundido cruzado, seleccionable bajo el botón de inicio. Dos ambientes
+  sintetizados propios en `assets/ambience/`, provisionales, pendientes de sustituir por CC0 reales.
+  Comparte el volumen del gong; solo suena con el temporizador en marcha.
+- Ajustes pasa a una rueda discreta bajo el play. Finalizar solo aparece en pausa o al completar.
+- Distribución en dos columnas en pantallas bajas; antes el botón de inicio quedaba fuera.
+
+Correcciones de revisión de tienda aplicadas en esta versión:
+
+- `SYSTEM_ALERT_WINDOW` (lo añade `expo-dev-client`) ahora se elimina vía `blockedPermissions`.
+  **Verificar en el AAB de la build 9**, como se hizo con FOREGROUND_SERVICE en la 7.
+- Pantalla de arranque con fondo `#181613`; antes era blanca y destellaba en cada arranque en frío.
+- Icono monocromo de Android 13+ regenerado a 1024 y enlazado en `adaptiveIcon.monochromeImage`.
+  `icon.png` y `adaptive-icon.png` no han cambiado: el icono de las tiendas sigue igual.
+- `enableProguardInReleaseBuilds` activado para que el AAB lleve el mapping de R8 y Play pueda
+  desofuscar. Sin shrink de recursos. **Riesgo: R8 cambia el comportamiento en release; la build 9
+  necesita prueba en dispositivo antes de enviarse.** Se revierte quitando el plugin de app.json.
+- Permiso de avisos solicitable desde Ajustes, en vez de solo al pulsar iniciar.
+- Límites de escalado tipográfico en la hoja de ajustes y en los textos de la pantalla principal.
+- Copia de ficha en inglés preparada en `store/en-GB/listing.md`; sin subir. Necesita páginas de
+  privacidad y soporte en inglés, que hoy no existen.
+
+Validación: TypeScript, 27 pruebas de lógica, 32 escenarios Playwright y expo-doctor 21/21.
+Sin compilación nativa: este entorno no tiene JDK, Android SDK ni Xcode.
+
+Pendiente y no hecho aquí:
+
+- Capturas nativas de tienda. Las de `store/*/screenshots/*.png` se regeneraron el 8 de septiembre
+  a resolución exacta con `scripts/capture-screenshots.ts`, pero **siguen siendo capturas web**.
+- iOS: la última versión enviada a revisión es la 1.1.0 (7), con el nombre antiguo del lanzador.
+  La build 8 se subió por EAS Submit y nunca se seleccionó. Falta iniciar sesión, elegir la build
+  nueva, actualizar capturas y enviar.
+- Google Play: la ficha muestra capturas de la build 8, con la cabecera que ya no existe.

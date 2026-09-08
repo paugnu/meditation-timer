@@ -25,6 +25,11 @@ export async function prepareAlerts(language: Settings['language'] = 'es'): Prom
   if (!permission.granted) permission = await Notifications.requestPermissionsAsync();
   return permission.granted;
 }
+/** Whether the system will show our completion alert, without asking for anything. */
+export async function alertsGranted(): Promise<boolean> {
+  if (Platform.OS === 'web') return false;
+  try { return (await Notifications.getPermissionsAsync()).granted; } catch { return false; }
+}
 export async function cancelAlert() {
   if (Platform.OS === 'web') return;
   await Notifications.cancelScheduledNotificationAsync(ID);

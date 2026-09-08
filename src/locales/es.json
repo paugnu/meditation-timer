@@ -21,7 +21,6 @@
   "Suena al completar el tiempo elegido.": "Suena al completar el tiempo elegido.",
   "Gong de meditación · Marble Toast (CC0).": "Gong de meditación · Marble Toast (CC0).",
   "Volumen": "Volumen",
-  "Volumen del gong": "Volumen del gong",
   "{n} por ciento": "{n} por ciento",
   "Escuchar gong": "Escuchar gong",
   "Preparando gong…": "Preparando gong…",
@@ -110,5 +109,15 @@
   "Eliminar definitivamente": "Eliminar definitivamente",
   "¿Eliminar esta meditación? Se descontará del tiempo meditado. Esta acción no se puede deshacer.": "¿Eliminar esta meditación? Se descontará del tiempo meditado. Esta acción no se puede deshacer.",
   "Política de privacidad": "Política de privacidad",
-  "Ayuda y contacto": "Ayuda y contacto"
+  "Ayuda y contacto": "Ayuda y contacto",
+  "Sonido de fondo": "Sonido de fondo",
+  "Sin sonido de fondo": "Sin sonido de fondo",
+  "Lluvia suave": "Lluvia suave",
+  "Olas del mar": "Olas del mar",
+  "No se ha podido reproducir el sonido de fondo.": "No se ha podido reproducir el sonido de fondo.",
+  "SONIDO DE FONDO": "SONIDO DE FONDO",
+  "Se aplica al gong y al sonido de fondo.": "Se aplica al gong y al sonido de fondo.",
+  "Sin permiso de avisos, el gong solo suena con la app abierta.": "Sin permiso de avisos, el gong solo suena con la app abierta.",
+  "Permitir avisos": "Permitir avisos",
+  "Pidiendo permiso…": "Pidiendo permiso…"
 }

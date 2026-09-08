@@ -1,97 +1,174 @@
-# Meditation Timer
+# Meditation Timer · YogaBond
 
-App de meditación en **Expo SDK 57 + React Native + TypeScript**, para Android e iOS. Recrea la pantalla de la referencia de Telesense: fondo negro o blanco, reloj de una aguja, cuenta atrás y botones sencillos. Interfaz en español, sin anuncios, cuentas, backend ni analítica.
+Temporizador de meditación para Android, iOS y web, hecho con **Expo SDK 57 + React Native + TypeScript**.
+Sin anuncios, sin cuentas, sin backend y sin analítica: todo —preferencias, sesión en curso e historial—
+se guarda solo en el dispositivo. Publicado bajo la marca YogaBond en Google Play y App Store.
+
+Versión actual: `1.2.0`, build 9 (Android `versionCode` 9 / iOS `buildNumber` 9), sin compilar todavía.
+Identificador en ambas plataformas: `com.pau.meditationtimer`.
+
+---
+
+## Qué hace
+
+**Sesión**
+- Duración de 1 a 180 minutos, con accesos rápidos (5, 10, 15, 30, 45, 60). Por defecto 20.
+- Iniciar, pausar, continuar y finalizar. Mientras la sesión corre la pantalla ofrece solo pausar:
+  para terminar antes de tiempo se pausa primero. Al finalizar antes de tiempo pregunta si quieres
+  guardar la meditación; el reloj se congela antes de preguntar, así que decidir no cuenta como
+  práctica.
+- Cuenta atrás basada en una **fecha límite absoluta**: cerrar y reabrir la app no reinicia nada
+  y una sesión vencida en segundo plano aparece como completada, sin gong tardío.
+- Halo animado en lugar de esfera: estela en giro lento de 24 s y arco de progreso independiente.
+  Respeta «Reducir movimiento» y se detiene en segundo plano.
+
+**Sonido y avisos**
+- Gong al inicio y al final con interruptores independientes, volumen y escucha previa.
+  Reanudar una pausa no vuelve a sonar.
+- Notificación local al terminar en Android/iOS, con canal propio para el sonido del gong.
+  Se cancela al pausar o finalizar. El gong en primer plano usa el volumen de la app;
+  el de la notificación, el canal y volumen del sistema.
+- Sonido de fondo en bucle, elegible bajo la cuenta atrás con dos flechas o deslizando.
+  Solo suena mientras el temporizador corre: elegirlo en reposo no reproduce nada, y pausar
+  o terminar lo desvanece. Cambiar de ambiente hace fundido cruzado, nunca un corte.
+  Comparte el volumen del gong, así que un único deslizador gobierna todo lo que suena.
+  Al salir de la app el sistema lo detiene; al volver reaparece con un fundido de entrada.
+- El gong y el fondo se turnan: con gong de inicio, el ambiente espera y entra bajo su cola;
+  al terminar, el ambiente se retira mientras el gong suena. El retardo se calcula desde la
+  duración real del gong, no de una constante.
+
+**Sin interrupciones**
+- Android: No molestar automático mediante un módulo Expo local en Kotlin, con permisos explícitos
+  de política de notificaciones y alarmas exactas. Restaura el estado anterior al terminar, pausar,
+  reiniciar el teléfono o actualizar la app.
+- iOS: instrucciones dentro de Ajustes para activar Concentración manualmente (el sistema no permite
+  automatizarlo).
+
+**Registro**
+- Calendario mensual (semana desde el lunes) con minutos reales por fecha local de inicio; los días
+  vacíos no muestran cero y las sesiones de menos de un minuto aparecen como `<1`.
+- Lista del día seleccionado con hora, tiempo efectivo, objetivo y estado, más el total acumulado.
+  Las pausas no suman tiempo. Borrado individual de registros con confirmación.
+
+**Interfaz**
+- Pantalla principal sin título ni cabecera: arriba el halo y la cuenta atrás, después el botón
+  de inicio, y por debajo la zona de controles con el selector de sonido de fondo y una rueda de
+  ajustes discreta.
+- Temas noche/día y cuatro colores de acento (terracota, azul, verde, rosa), paleta YogaBond con
+  titulares en Raleway incluida localmente.
+- Seis idiomas seleccionables y persistidos: español, català/valencià, English, Nederlands, français,
+  русский. 112 claves por idioma, con los mismos tokens de interpolación (hay una prueba que lo verifica).
+  El criterio de la variante valenciana está en [docs/VALENCIAN.md](docs/VALENCIAN.md).
+- Opción de mantener la pantalla encendida durante la sesión.
+- En pantallas bajas (teléfono en horizontal, Split View) el halo pasa a la izquierda y los
+  controles a la derecha, para que el botón de inicio nunca quede fuera de la pantalla.
+- El permiso de avisos se puede conceder desde Ajustes, sin esperar a que lo pida el botón de
+  inicio. Los textos limitan su escalado para que las filas no se rompan con tamaños grandes.
+- Petición de valoración nativa una sola vez por instalación, tras cinco sesiones completas y nunca
+  durante una meditación.
+
+---
 
 ## Ejecutar
 
-Requisitos: Node.js >= 22.13, npm.
+Requisitos: Node.js ≥ 22.13 y npm.
 
 ```bash
 npm ci
-npm run web            # vista de desarrollo en el navegador
-npx expo start --go     # probar funciones compatibles con Expo Go
+npm run web
 ```
 
-Para probar la integración completa usa una **development build**: Expo Go no incluye el módulo Android propio de No molestar ni instala nuestro sonido de notificación.
+Expo Go sirve para probar la lógica, pero **no** incluye el módulo Android de No molestar ni instala
+el sonido de notificación. Para la integración completa hace falta una *development build*:
 
 ```bash
-npm run android        # Android SDK + JDK + emulador o dispositivo USB
-npm run ios            # macOS + Xcode + simulador/dispositivo
+npm run android   # requiere Android SDK + JDK y emulador o dispositivo
+npm run ios       # requiere macOS + Xcode
 ```
 
-## Compilar con EAS
+## Verificar
 
-La configuración está en `eas.json`; los identificadores iniciales son `com.pau.meditationtimer`. Antes de publicar, revisa nombre e identificadores en `app.json`.
+```bash
+npm run typecheck
+npm test          # 27 pruebas de lógica (node:test vía tsx)
+npm run test:e2e  # 32 escenarios Playwright sobre la vista web; necesita Google Chrome
+npx expo-doctor
+npx expo export --platform all
+npx expo prebuild --no-install
+```
+
+`playwright.config.ts` levanta `expo start --web` en el puerto 8081 a 390×844 y usa el canal `chrome`;
+cámbialo a Chromium si no lo tienes. Resultados y pruebas físicas pendientes en
+[docs/VALIDATION.md](docs/VALIDATION.md); plan y matriz de extracción en [docs/PLAN.md](docs/PLAN.md).
+
+## Compilar y distribuir
+
+Perfiles en `eas.json`: `development` (cliente de desarrollo), `preview` (APK interno / simulador iOS),
+`production` y `testing` (AAB de tienda + envío a canal interno de Play y a TestFlight).
 
 ```bash
 npx eas-cli@latest login
-npx eas-cli@latest build:configure
-npx eas-cli@latest build --platform android --profile preview      # APK instalable
-npx eas-cli@latest build --platform ios --profile preview          # simulador iOS
-npx eas-cli@latest build --platform all --profile development      # cliente de desarrollo
-npx eas-cli@latest build --platform all --profile production       # tiendas
+npx eas-cli@latest build --platform android --profile preview
+npx eas-cli@latest build --platform ios --profile testing --no-wait
+npx eas-cli@latest submit --platform ios --profile testing --id ID_DE_LA_BUILD
 ```
 
-EAS necesita una cuenta Expo y, para firmar versiones de iOS para dispositivos/tienda, credenciales Apple. No se han generado ni enviado binarios firmados a las tiendas.
+El estado real de cada build, envío y revisión en Google Play y App Store Connect se lleva en
+[store/RELEASE-STATUS.md](store/RELEASE-STATUS.md), junto con los textos de ficha en `store/es-ES/`,
+`store/android-public/` y `store/ios-public/`.
 
-## Funciones
-
-- Duración de 1–180 minutos y accesos rápidos; 20 minutos por defecto.
-- Inicio, pausa, continuación y finalización; repetir al completar.
-- Reloj analógico de 16 marcas y cuenta atrás con segundos.
-- Temas noche/día y cuatro colores.
-- Gong incluido con interruptores independientes al inicio y al final, volumen y escucha previa. No vuelve a sonar al reanudar una pausa.
-- Menú Ajustes con apartados Configuración y Registro; disponible también mientras la sesión está pausada.
-- Idiomas: español, catalán, inglés, neerlandés, francés y ruso, seleccionables en Ajustes y guardados en el dispositivo.
-- Calendario mensual con navegación y minutos reales acumulados por fecha local de inicio; días vacíos sin cero y sesiones menores de un minuto como <1 min. Se mantiene la lista completa debajo.
-- Registro local de meditaciones: fecha, tiempo efectivo, objetivo, estado y tiempo total acumulado. Las pausas no suman tiempo y se conservan las sesiones finalizadas antes de tiempo.
-- Preferencias, sesión e historial guardados localmente con AsyncStorage.
-- Recuperación después de cerrar/reabrir; cuenta basada en fecha límite absoluta.
-- Opción de pantalla encendida durante la sesión; barras del sistema ocultas mientras corre.
-- Aviso local al terminar en Android/iOS. Se cancela al pausar/finalizar.
-- No molestar automático en Android mediante módulo Expo local, con permisos explícitos del sistema. Restaura el estado al terminar, pausar, reiniciar el teléfono o actualizar la aplicación.
-- En iOS, instrucciones para activar Concentración manualmente.
+---
 
 ## Comportamiento por plataforma
 
 | Función | Android instalado | iOS instalado | Web |
 | --- | --- | --- | --- |
 | Temporizador, ajustes, sesión persistente | Sí | Sí | Sí |
-| Gong con app visible | Sí | Sí | Sí, tras interacción |
+| Gong con la app visible | Sí | Sí | Sí, tras una interacción |
 | Aviso con pantalla bloqueada | Notificación local | Notificación local | No |
 | No molestar automático | Con permisos de política y alarmas exactas | No permitido por iOS | Manual |
-| Pantalla encendida | Sí | Sí | Según soporte del navegador |
+| Pantalla encendida | Sí | Sí | Según el navegador |
 
-El gong en primer plano usa el volumen configurado dentro de la app. El sonido de la notificación usa el volumen/canal del sistema. Los permisos, el modo silencio/Concentración, las políticas de batería y el cierre forzado pueden impedir o retrasar avisos. No se reproduce otro gong tardío al volver a una sesión que venció en segundo plano. Android mantiene permitidas las alarmas cuando activa No molestar; no se promete bloquear cada posible interrupción.
-
-El módulo nativo exige permiso de alarmas exactas antes de activar No molestar para poder programar su restauración. Android 15+ cambia la regla implícita propiedad de la app; en versiones anteriores conserva el filtro previo y evita sobrescribir un cambio de modo realizado por el usuario durante la sesión. Si el usuario fuerza la detención de la aplicación, Android puede cancelar alarmas: debe revisar No molestar manualmente. Tras reiniciar el teléfono se restaura No molestar; no se garantiza que sobreviva el aviso de una sesión anterior al reinicio.
-
-## Verificación
-
-```bash
-npm run typecheck
-npm test
-npm run test:e2e        # requiere Google Chrome; o configura Chromium en playwright.config.ts
-npx expo-doctor
-npx expo export --platform all
-npx expo prebuild --no-install
-```
-
-La guía y los resultados concretos están en [docs/VALIDATION.md](docs/VALIDATION.md). El plan y la matriz de extracción, con evidencias y decisiones propias, están en [docs/PLAN.md](docs/PLAN.md).
+Los permisos, el modo silencio/Concentración, las políticas de batería del fabricante y el cierre
+forzado pueden impedir o retrasar los avisos: no se promete ejecución de JavaScript en segundo plano.
+Android mantiene las alarmas permitidas cuando activa No molestar, así que no se bloquea toda
+interrupción posible. Si el usuario fuerza la detención de la app, Android puede cancelar la alarma de
+restauración y habrá que revisar No molestar a mano.
 
 ## Estructura
 
-- `App.tsx`: pantalla principal adaptable.
-- `src/timer.ts`: máquina de estados pura y recuperación.
-- `src/history.ts`: registro, recuperación sin duplicados y cálculo del tiempo meditado.
-- `src/hooks/useMeditation.ts`: sesión, persistencia, audio y ciclo de vida.
-- `src/components/SettingsPanel.tsx`: ajustes.
-- `src/services/`: notificaciones, almacenamiento y puente No molestar.
-- `modules/meditation-focus/`: módulo Kotlin local autovinculado por Expo.
-- `assets/gong.wav`: grabación «Meditation Gong» de Marble Toast (CC0), adaptada a WAV mono; fuente y licencia en `assets/gong-LICENSE.md`.
-- `scripts/generate-gong.py`: alternativa sintetizada opcional; genera `gong-synth.wav`.
-- `tests/`: pruebas de lógica y flujos web.
+```
+App.tsx                      Pantalla principal, modal de confirmación y avisos
+index.ts                     registerRootComponent
+src/timer.ts                 Máquina de estados pura, recuperación y formato
+src/history.ts               Registro, validación y tiempo efectivo sin pausas
+src/calendar.ts              Agrupación por día local y cuadrícula del mes
+src/ambience.ts              Lista de sonidos de fondo y recorrido del selector
+src/settings.ts              Preferencias, valores por defecto y saneado
+src/i18n.ts + src/locales/   Seis diccionarios e interpolación
+src/theme.ts                 Paleta YogaBond y fuente de titulares
+src/reviewPolicy.ts          Política pura de valoración (un intento por instalación)
+src/hooks/useMeditation.ts   Sesión, persistencia, audio, permisos y ciclo de vida
+src/hooks/useAmbience.ts     Motor de fundido cruzado del sonido de fondo
+src/components/              ClockFace (halo), SettingsPanel, HistoryPanel, HistoryCalendar, Icon
+src/services/                storage (AsyncStorage), alerts (notificaciones), focus, reviews
+modules/meditation-focus/    Módulo Expo local en Kotlin para No molestar (Android)
+assets/gong.wav              «Meditation Gong» de Marble Toast (CC0); licencia en gong-LICENSE.md
+assets/ambience/             Ambientes sintetizados propios; licencia en ambience/LICENSE.md
+scripts/                     Generadores de ambientes, gong e iconos, y capturas de tienda
+tests/                       Pruebas de lógica y flujos web (Playwright)
+docs/, store/                Plan, validación, criterio de valencià y material de tienda
+```
 
-## Referencia y alcance
+## Créditos y alcance
 
-[Google Play: Meditation Timer de Telesense](https://play.google.com/store/apps/details?id=uk.co.telesense.tm.free&hl=en). Se ha revisado la ficha y sus seis capturas, no el APK. La pantalla principal reproduce los elementos observables; los ajustes no visibles se han diseñado expresamente. No hay afiliación con Telesense y no se incluyen sus imágenes o grabaciones en el producto.
+Gong: «Meditation Gong» de Marble Toast, CC0, adaptado a WAV mono; detalles en
+[assets/gong-LICENSE.md](assets/gong-LICENSE.md). Titulares en Raleway (SIL OFL) empaquetada localmente.
+Los sonidos de fondo actuales son **provisionales**: están sintetizados por
+[scripts/generate-ambience.py](scripts/generate-ambience.py), no son grabaciones, y están pensados
+para sustituirse por material CC0 real. Ver [assets/ambience/LICENSE.md](assets/ambience/LICENSE.md).
+
+El diseño de la pantalla principal partió de una revisión de la ficha pública y las seis capturas de
+[Meditation Timer de Telesense](https://play.google.com/store/apps/details?id=uk.co.telesense.tm.free&hl=en);
+no se revisó el APK, no hay afiliación y no se incluye ninguna imagen ni grabación suya. Los ajustes,
+el registro y la identidad visual son propios.

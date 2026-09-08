@@ -6,6 +6,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
 import { COLORS, Settings } from '../settings';
 import { focus } from '../services/focus';
+import { alertsGranted, prepareAlerts } from '../services/alerts';
 import { Icon } from './Icon';
 import { MeditationRecord } from '../history';
 import { HistoryPanel } from './HistoryPanel';
@@ -22,12 +23,15 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
   const [error, setError] = useState('');
   const [soundError, setSoundError] = useState('');
   const [testingSound, setTestingSound] = useState(false);
+  const [alerts, setAlerts] = useState<boolean | null>(null);
+  const [asking, setAsking] = useState(false);
   const [access, setAccess] = useState(focus.hasAccess());
   const [exact, setExact] = useState(focus.canScheduleExact());
+  useEffect(() => { if (visible) void alertsGranted().then(setAlerts); }, [visible]);
   useEffect(() => { if (visible) { setSection('settings'); setSoundError(''); setMinutes(String(settings.minutes)); setError(''); setAccess(focus.hasAccess()); setExact(focus.canScheduleExact()); } }, [visible]);
   useEffect(() => {
     const subscription = AppState.addEventListener('change', status => {
-      if (status === 'active') { setAccess(focus.hasAccess()); setExact(focus.canScheduleExact()); }
+      if (status === 'active') { setAccess(focus.hasAccess()); setExact(focus.canScheduleExact()); void alertsGranted().then(setAlerts); }
     });
     return () => subscription.remove();
   }, []);
@@ -51,20 +55,20 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
       if (!(await testSound())) setSoundError('No se ha podido reproducir el gong. Comprueba el volumen y vuelve a intentarlo.');
     } finally { setTestingSound(false); }
   };
-  const heading = (label: string) => <Text style={[styles.sectionTitle, { color: muted }]}>{label}</Text>;
+  const heading = (label: string) => <Text maxFontSizeMultiplier={1.4} style={[styles.sectionTitle, { color: muted }]}>{label}</Text>;
   const toggle = (label: string, value: boolean, onChange: (v: boolean) => void, detail?: string) =>
     <View style={[styles.row, { borderColor: line }]}>
-      <View style={styles.rowText}><Text style={[styles.label, { color: text }]}>{label}</Text>{detail && <Text style={[styles.detail, { color: muted }]}>{detail}</Text>}</View>
+      <View style={styles.rowText}><Text maxFontSizeMultiplier={1.4} style={[styles.label, { color: text }]}>{label}</Text>{detail && <Text maxFontSizeMultiplier={1.6} style={[styles.detail, { color: muted }]}>{detail}</Text>}</View>
       <Switch accessibilityLabel={label} value={value} onValueChange={onChange} trackColor={{ false: dark ? '#383838' : '#D4D4D4', true: accent }} thumbColor="#FFFFFF" />
     </View>;
-  const button = (label: string, onPress: () => void) => <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.linkButton, { opacity: pressed ? .5 : 1 }]}><Text style={{ color: accent, fontSize: 15 }}>{label}</Text></Pressable>;
+  const button = (label: string, onPress: () => void) => <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.linkButton, { opacity: pressed ? .5 : 1 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: accent, fontSize: 15 }}>{label}</Text></Pressable>;
 
   return <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" onRequestClose={dismiss}>
     <SafeAreaProvider>
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
       <View style={[styles.container, { backgroundColor: bg }]}>
         <View style={[styles.header, { borderColor: line }]}>
-          <Text accessibilityRole="header" style={[styles.title, { color: text }]}>{t("Ajustes")}</Text>
+          <Text accessibilityRole="header" maxFontSizeMultiplier={1.4} style={[styles.title, { color: text }]}>{t("Ajustes")}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel={t("Cerrar ajustes")} onPress={dismiss} style={({ pressed }) => [styles.iconButton, { opacity: pressed ? .5 : 1 }]}><Icon name="close" color={text}/></Pressable>
         </View>
         <View style={[styles.tabs, { borderColor: line }]}>
@@ -90,13 +94,21 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
           {heading(t("SONIDO"))}
           {toggle(t("Gong al inicio"), settings.gongStart, gongStart => update({ gongStart }), t("Suena al empezar una nueva meditación."))}
           {toggle(t("Gong al final"), settings.gong, gong => update({ gong }), t("Suena al completar el tiempo elegido."))}
-          <Text style={[styles.detail, { color: muted }]}>{t("Gong de meditación · Marble Toast (CC0).")}</Text>
+          <Text maxFontSizeMultiplier={1.6} style={[styles.detail, { color: muted }]}>{t("Gong de meditación · Marble Toast (CC0).")}</Text>
+          {Platform.OS !== 'web' && alerts === false && <>
+            <Text maxFontSizeMultiplier={1.6} style={[styles.detail, { color: muted }]}>{t("Sin permiso de avisos, el gong solo suena con la app abierta.")}</Text>
+            {button(asking ? t("Pidiendo permiso…") : t("Permitir avisos"), () => {
+              if (asking) return;
+              setAsking(true);
+              void prepareAlerts(settings.language).then(setAlerts).catch(() => setAlerts(false)).finally(() => setAsking(false));
+            })}
+          </>}
           <>
             <View style={[styles.row, { borderBottomWidth: 0 }]}><Text style={[styles.label, { color: text }]}>{t("Volumen")}</Text><Text style={{ color: muted }}>{Math.round(settings.volume * 100)} %</Text></View>
-            <Slider accessibilityLabel={t("Volumen del gong")} accessibilityValue={{ min: 0, max: 100, now: Math.round(settings.volume * 100), text: t('{n} por ciento', { n: Math.round(settings.volume * 100) }) }} minimumValue={0} maximumValue={1} step={.05} value={settings.volume} onValueChange={volume => update({ volume })} minimumTrackTintColor={accent} maximumTrackTintColor={line} thumbTintColor={accent} style={{ height: 40 }} />
+            <Slider accessibilityLabel={t("Volumen")} accessibilityValue={{ min: 0, max: 100, now: Math.round(settings.volume * 100), text: t('{n} por ciento', { n: Math.round(settings.volume * 100) }) }} minimumValue={0} maximumValue={1} step={.05} value={settings.volume} onValueChange={volume => update({ volume })} minimumTrackTintColor={accent} maximumTrackTintColor={line} thumbTintColor={accent} style={{ height: 40 }} />
             <Pressable accessibilityRole="button" accessibilityLabel={t("Escuchar gong")} disabled={testingSound} onPress={() => { void previewSound(); }} style={styles.linkButton}><Text style={{ color: accent, fontSize: 15 }}>{testingSound ? t("Preparando gong…") : t("Escuchar gong")}</Text></Pressable>
             {!!soundError && <Text accessibilityRole="alert" style={styles.error}>{t(soundError)}</Text>}
-            <Text style={[styles.detail, { color: muted }]}>{t("Con la pantalla bloqueada, el volumen del aviso depende de los ajustes del sistema.")}</Text>
+            <Text style={[styles.detail, { color: muted }]}>{t("Se aplica al gong y al sonido de fondo.")}{"\n"}{t("Con la pantalla bloqueada, el volumen del aviso depende de los ajustes del sistema.")}</Text>
           </>
 
           {heading(t("PANTALLA"))}
@@ -112,7 +124,7 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
             {!access && button(t("Permitir acceso a No molestar"), focus.openAccessSettings)}
             {!exact && button(t("Permitir alarmas y recordatorios"), focus.openAlarmSettings)}
             <Text style={[styles.detail, { color: muted }]}>{access && exact ? t("Permisos concedidos.") : t("Concede ambos permisos para activar y restaurar No molestar automáticamente.")}</Text>
-          </> : <Text style={[styles.paragraph, { color: muted }]}>{Platform.OS === 'ios' ? t("Antes de empezar, activa No molestar desde el Centro de control → Concentración. iOS no permite que la app lo active automáticamente. Permite los avisos de esta app si quieres escuchar el gong con la pantalla bloqueada.") : Platform.OS === 'android' ? t("No molestar automático está disponible en la versión Android instalada, fuera de Expo Go. Mientras tanto, actívalo desde los ajustes rápidos del teléfono.") : t("En esta vista web, activa No molestar en tu dispositivo. Para escuchar el gong, mantén esta pestaña abierta; los avisos con la pantalla bloqueada están disponibles en Android e iOS.")}</Text>}
+          </> : <Text maxFontSizeMultiplier={1.6} style={[styles.paragraph, { color: muted }]}>{Platform.OS === 'ios' ? t("Antes de empezar, activa No molestar desde el Centro de control → Concentración. iOS no permite que la app lo active automáticamente. Permite los avisos de esta app si quieres escuchar el gong con la pantalla bloqueada.") : Platform.OS === 'android' ? t("No molestar automático está disponible en la versión Android instalada, fuera de Expo Go. Mientras tanto, actívalo desde los ajustes rápidos del teléfono.") : t("En esta vista web, activa No molestar en tu dispositivo. Para escuchar el gong, mantén esta pestaña abierta; los avisos con la pantalla bloqueada están disponibles en Android e iOS.")}</Text>}
           {Platform.OS !== 'web' && button(t("Abrir ajustes de la aplicación"), () => { void Linking.openSettings().catch(() => setError('No se han podido abrir los ajustes del dispositivo.')); })}
           <View style={[styles.footer, { borderColor: line }]}><Text style={{ color: text, fontSize: 14 }}>Meditation Timer · YogaBond</Text><Text style={[styles.detail, { color: muted }]}>{t("Tu tiempo. Tu práctica.")}</Text><Pressable accessibilityRole="link" accessibilityLabel={t('Una app de YogaBond')} onPress={() => { void Linking.openURL('https://www.yogabond.es/').catch(() => setError('No se ha podido abrir la web de YogaBond.')); }} style={styles.linkButton}><Text style={{ color: accent, fontSize: 14 }}>{t('Una app de YogaBond')} ↗</Text></Pressable>{[['Política de privacidad', 'privacy#meditation-timer'], ['Ayuda y contacto', '#meditation-timer-support']].map(([label, path]) => <Pressable key={label} accessibilityRole="link" accessibilityLabel={t(label)} onPress={() => { void Linking.openURL(`https://www.yogabond.es/${settings.language}${path.startsWith('#') ? '' : '/'}${path}`).catch(() => setError('No se ha podido abrir la web de YogaBond.')); }} style={styles.linkButton}><Text style={{ color: accent, fontSize: 14 }}>{t(label)} ↗</Text></Pressable>)}<Text style={[styles.detail, { color: muted, marginTop: 12 }]}>{t("Sin anuncios, cuentas ni meditaciones guiadas.")}{"\n"}{t("Tus preferencias y meditaciones se guardan en este dispositivo.")}</Text></View>
         </ScrollView>}

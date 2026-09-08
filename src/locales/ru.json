@@ -21,7 +21,6 @@
   "Suena al completar el tiempo elegido.": "Звучит по истечении выбранного времени.",
   "Gong de meditación · Marble Toast (CC0).": "Гонг для медитации · Marble Toast (CC0).",
   "Volumen": "Громкость",
-  "Volumen del gong": "Громкость гонга",
   "{n} por ciento": "{n} процентов",
   "Escuchar gong": "Послушать гонг",
   "Preparando gong…": "Подготовка гонга…",
@@ -110,5 +109,15 @@
   "Eliminar definitivamente": "Удалить навсегда",
   "¿Eliminar esta meditación? Se descontará del tiempo meditado. Esta acción no se puede deshacer.": "Удалить эту медитацию? Её длительность будет вычтена из времени медитации. Это действие нельзя отменить.",
   "Política de privacidad": "Политика конфиденциальности",
-  "Ayuda y contacto": "Помощь и контакты"
+  "Ayuda y contacto": "Помощь и контакты",
+  "Sonido de fondo": "Фоновый звук",
+  "Sin sonido de fondo": "Без фонового звука",
+  "Lluvia suave": "Тихий дождь",
+  "Olas del mar": "Морские волны",
+  "No se ha podido reproducir el sonido de fondo.": "Не удалось воспроизвести фоновый звук.",
+  "SONIDO DE FONDO": "ФОНОВЫЙ ЗВУК",
+  "Se aplica al gong y al sonido de fondo.": "Действует и для гонга, и для фонового звука.",
+  "Sin permiso de avisos, el gong solo suena con la app abierta.": "Без разрешения на уведомления гонг звучит только при открытом приложении.",
+  "Permitir avisos": "Разрешить уведомления",
+  "Pidiendo permiso…": "Запрашиваем разрешение…"
 }

@@ -21,7 +21,6 @@
   "Suena al completar el tiempo elegido.": "Klinkt wanneer de gekozen tijd voorbij is.",
   "Gong de meditación · Marble Toast (CC0).": "Meditatiegong · Marble Toast (CC0).",
   "Volumen": "Volume",
-  "Volumen del gong": "Volume van de gong",
   "{n} por ciento": "{n} procent",
   "Escuchar gong": "Gong beluisteren",
   "Preparando gong…": "Gong voorbereiden…",
@@ -110,5 +109,15 @@
   "Eliminar definitivamente": "Definitief verwijderen",
   "¿Eliminar esta meditación? Se descontará del tiempo meditado. Esta acción no se puede deshacer.": "Deze meditatie verwijderen? De tijd wordt van je totale meditatietijd afgetrokken. Dit kan niet ongedaan worden gemaakt.",
   "Política de privacidad": "Privacybeleid",
-  "Ayuda y contacto": "Hulp en contact"
+  "Ayuda y contacto": "Hulp en contact",
+  "Sonido de fondo": "Achtergrondgeluid",
+  "Sin sonido de fondo": "Geen achtergrondgeluid",
+  "Lluvia suave": "Zachte regen",
+  "Olas del mar": "Zeegolven",
+  "No se ha podido reproducir el sonido de fondo.": "Het achtergrondgeluid kon niet worden afgespeeld.",
+  "SONIDO DE FONDO": "ACHTERGRONDGELUID",
+  "Se aplica al gong y al sonido de fondo.": "Geldt voor zowel de gong als het achtergrondgeluid.",
+  "Sin permiso de avisos, el gong solo suena con la app abierta.": "Zonder meldingsrechten klinkt de gong alleen als de app open is.",
+  "Permitir avisos": "Meldingen toestaan",
+  "Pidiendo permiso…": "Toestemming vragen…"
 }

@@ -21,7 +21,6 @@
   "Suena al completar el tiempo elegido.": "Sona en completar el temps triat.",
   "Gong de meditación · Marble Toast (CC0).": "Gong de meditació · Marble Toast (CC0).",
   "Volumen": "Volum",
-  "Volumen del gong": "Volum del gong",
   "{n} por ciento": "{n} per cent",
   "Escuchar gong": "Escolta el gong",
   "Preparando gong…": "Preparant el gong…",
@@ -110,5 +109,15 @@
   "Eliminar definitivamente": "Elimina definitivament",
   "¿Eliminar esta meditación? Se descontará del tiempo meditado. Esta acción no se puede deshacer.": "Vols eliminar esta meditació? Es descomptarà del temps meditat. Esta acció no es pot desfer.",
   "Política de privacidad": "Política de privacitat",
-  "Ayuda y contacto": "Ajuda i contacte"
+  "Ayuda y contacto": "Ajuda i contacte",
+  "Sonido de fondo": "So de fons",
+  "Sin sonido de fondo": "Sense so de fons",
+  "Lluvia suave": "Pluja suau",
+  "Olas del mar": "Ones del mar",
+  "No se ha podido reproducir el sonido de fondo.": "No s'ha pogut reproduir el so de fons.",
+  "SONIDO DE FONDO": "SO DE FONS",
+  "Se aplica al gong y al sonido de fondo.": "S'aplica al gong i al so de fons.",
+  "Sin permiso de avisos, el gong solo suena con la app abierta.": "Sense permís d'avisos, el gong només sona amb l'app oberta.",
+  "Permitir avisos": "Permet els avisos",
+  "Pidiendo permiso…": "Demanant permís…"
 }

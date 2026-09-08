@@ -8,6 +8,7 @@ import { readStored, writeStored } from '../services/storage';
 import { cancelAlert, prepareAlerts, scheduleAlert } from '../services/alerts';
 import { focus } from '../services/focus';
 import { ActiveSession, MeditationRecord, finishSession, newSession, restoreActiveSession, restoreHistory } from '../history';
+import { ambienceLeadMs } from '../ambience';
 
 export function useMeditation() {
   const [sessionSequence, setSessionSequence] = useState(0);
@@ -22,6 +23,7 @@ export function useMeditation() {
   const [confirmFinish, setConfirmFinish] = useState(false);
   const finishRequestedAt = useRef<number | null>(null);
   const [notice, setNotice] = useState('');
+  const [ambienceHold, setAmbienceHold] = useState(0);
   const state = useRef(timer);
   const prefs = useRef(settings);
   const lock = useRef(false);
@@ -139,6 +141,9 @@ export function useMeditation() {
     catch { setNotice('No se ha podido preparar el aviso al bloquear la pantalla. Mantén la app abierta.'); }
     if (!alertsAllowed && Platform.OS !== 'web') setNotice('Sin permiso de notificaciones: mantén la app abierta para escuchar el gong.');
     const isNewSession = state.current.status !== 'paused';
+    // An opening gong owns the first seconds; hold the ambience back so it fades in underneath.
+    const opensWithGong = isNewSession && prefs.current.gongStart && prefs.current.volume > 0;
+    setAmbienceHold(opensWithGong ? Date.now() + ambienceLeadMs(player.duration) : 0);
     const startedAt = Date.now();
     const next = transition(state.current, { type: 'start', now: startedAt });
     if (isNewSession) {
@@ -154,7 +159,8 @@ export function useMeditation() {
       catch { setNotice('No se ha podido programar el aviso. Mantén la app abierta para escuchar el gong.'); }
     }
     setNow(Date.now()); save(next);
-    if (isNewSession && prefs.current.gongStart && prefs.current.volume > 0) await playGong();
+    // A gong that never sounds must not keep the ambience waiting for it.
+    if (opensWithGong && !(await playGong())) setAmbienceHold(0);
   });
   const pause = () => run(async () => {
     const next = transition(state.current, { type: 'pause', now: Date.now() });
@@ -203,6 +209,6 @@ export function useMeditation() {
     const current = state.current;
     save(current.status === 'idle' || current.status === 'completed' ? idleTimer(next.minutes) : current, next);
   };
-  return { settings, timer, history, ready, busy, notice, sessionSequence, deleteRecord, clearNotice: () => setNotice(''), updateSettings, start, pause, requestFinish, resolveFinish, cancelFinish, confirmFinish, playGong,
+  return { settings, timer, history, ready, busy, notice, notify: setNotice, ambienceHold, sessionSequence, deleteRecord, clearNotice: () => setNotice(''), updateSettings, start, pause, requestFinish, resolveFinish, cancelFinish, confirmFinish, playGong,
     remainingMs: remaining(timer, now) };
 }
