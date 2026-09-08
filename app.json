@@ -1,25 +1,66 @@
 {
   "expo": {
-    "name": "meditation-expo",
-    "slug": "meditation-expo",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "name": "Meditation Timer · YogaBond",
+    "slug": "meditation-timer",
+    "version": "1.1.0",
+    "orientation": "default",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
+    "scheme": "meditation-timer",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pau.meditationtimer",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "buildNumber": "8"
     },
     "android": {
+      "package": "com.pau.meditationtimer",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#181613"
       },
-      "predictiveBackGestureEnabled": false
+      "permissions": [
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "versionCode": 8
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "name": "Meditation Timer · YogaBond",
+      "shortName": "Meditation Timer · YogaBond"
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/gong.wav"
+          ]
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e90d6b2f-30e8-4cde-8518-3e12b0a9287a"
+      },
+      "publicReviewsEnabled": true
+    },
+    "owner": "paugnu"
   }
 }
