@@ -337,3 +337,14 @@ Pendiente y no hecho aquí:
 - Verificación repetida en este equipo: TypeScript, 32 pruebas unitarias y 42 escenarios Playwright correctos. Bundles Android/iOS exportados con los ocho M4A y gong; sin conflictos funcionales encontrados. Esto no sustituye una prueba nativa en dispositivos.
 - Corregidas referencias documentales antiguas a la versión publicada y número de escenarios.
 - Se prepara 1.5.0 (15) desde el código integrado para continuar el envío previamente autorizado. Las builds 14 basadas en `408e238` quedan descartadas para distribución; nunca deben enviarse.
+
+### Compilaciones verificadas y envío de iOS 1.5.0 (15)
+
+- Fuente de ambas compilaciones: `74628cb73e80c3f2dd7f48f1e4c12cf6b1523c10`, subido a `origin/main`. Android EAS `d5c16532-8ce5-4dec-87d5-3fdb791ff0b5`; iOS EAS `67d9da84-d029-4d57-9b73-6b78f86133b1`.
+- iOS FINISHED. IPA verificado: `com.pau.meditationtimer`, 1.5.0 (15), storyboard SplashScreen y ocho M4A idénticos por SHA-256 a los recuperados. No sustituye una prueba de arranque o brillo físico en dispositivo.
+- La clave de App Store Connect ya guardada en EAS permite completar el envío sin iniciar sesión web. Subida EAS `3e3cd420-299c-4ad4-be43-f4ce9f262e0a` FINISHED; Apple build `3fd88954-b3eb-4a1d-a423-eba81cbbf5f3` VALID.
+- Ficha iOS 1.5.0 `47891b5e-95e1-40c5-bbaa-ebaf919b9518`: novedades actualizadas, descripción y datos de revisión conservados, ocho capturas por dispositivo conservadas (iPhone/iPad), publicación AFTER_APPROVAL.
+- **iOS enviado a App Review:** envío `71b041f9-15f3-4275-af8d-20830e0bdaff`, confirmado WAITING_FOR_REVIEW, enviado 2026-09-21T14:17:51Z. No implica aprobación ni publicación.
+- Android FINISHED. AAB verificado con bundletool: `com.pau.meditationtimer`, 1.5.0 (15), ocho M4A idénticos por SHA-256, permisos RECORD_AUDIO y SYSTEM_ALERT_WINDOW ausentes y archivo de asignación R8 presente. Subido al borrador de producción de Google Play (versión de canal 6); pendiente de terminar la validación y enviar a revisión.
+- **Android enviado a revisión:** producción `1.5.0 (15) · Inicio y duración`, versión de canal 6. Google Play valida sin errores ni pérdida de dispositivos y confirma «Cambios en revisión» tras enviar el único cambio pendiente (2026-09-21T14:23Z). Comprobaciones rápidas todavía en curso; pasarán a revisión al completarse correctamente. Lanzamiento completo al 100 % en los países de destino existentes, publicación gestionada desactivada. No implica aprobación ni disponibilidad pública.
+- Las dos tiendas han recibido los envíos de 1.5.0 (15). No se han enviado las builds 14 descartadas. Se conservan las limitaciones de validación nativa: arranque, brillo físico y No molestar requieren prueba en dispositivos reales.
