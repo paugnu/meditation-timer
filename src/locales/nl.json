@@ -119,5 +119,13 @@
   "Se aplica al gong y al sonido de fondo.": "Geldt voor zowel de gong als het achtergrondgeluid.",
   "Sin permiso de avisos, el gong solo suena con la app abierta.": "Zonder meldingsrechten klinkt de gong alleen als de app open is.",
   "Permitir avisos": "Meldingen toestaan",
-  "Pidiendo permiso…": "Toestemming vragen…"
+  "Pidiendo permiso…": "Toestemming vragen…",
+  "Guardar duración": "Duur opslaan",
+  "Reducir duración": "Duur verkorten",
+  "Aumentar duración": "Duur verlengen",
+  "Atenuar pantalla": "Scherm dimmen",
+  "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.": "Dimt het scherm na 10 seconden zonder aanraking tijdens de meditatie. Tik om de helderheid te herstellen.",
+  "Recuperar brillo": "Helderheid herstellen",
+  "Toca para recuperar el brillo": "Tik om de helderheid te herstellen",
+  "No se ha podido ajustar el brillo de la pantalla.": "De schermhelderheid kon niet worden aangepast."
 }

@@ -119,5 +119,13 @@
   "Se aplica al gong y al sonido de fondo.": "Se aplica al gong y al sonido de fondo.",
   "Sin permiso de avisos, el gong solo suena con la app abierta.": "Sin permiso de avisos, el gong solo suena con la app abierta.",
   "Permitir avisos": "Permitir avisos",
-  "Pidiendo permiso…": "Pidiendo permiso…"
+  "Pidiendo permiso…": "Pidiendo permiso…",
+  "Guardar duración": "Guardar duración",
+  "Reducir duración": "Reducir duración",
+  "Aumentar duración": "Aumentar duración",
+  "Atenuar pantalla": "Atenuar pantalla",
+  "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.": "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.",
+  "Recuperar brillo": "Recuperar brillo",
+  "Toca para recuperar el brillo": "Toca para recuperar el brillo",
+  "No se ha podido ajustar el brillo de la pantalla.": "No se ha podido ajustar el brillo de la pantalla."
 }

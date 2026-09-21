@@ -116,3 +116,21 @@ Fuentes: https://docs.expo.dev/versions/v57.0.0/sdk/storereview/ . Aportaciones 
 ## Eliminación individual de meditaciones
 
 Cada sesión de la lista diaria ofrece Eliminar registro, con confirmación en la propia fila y Cancelar. La eliminación se realiza por ID y se persiste con la cola de almacenamiento existente, conservando temporizador y preferencias. Calendario, totales y lista se recalculan sin cambiar el día elegido. Textos en los seis idiomas, incluida la variante valenciana. Regresión de interfaz para cancelar, eliminar una de varias sesiones, conservar otro día, persistir al recargar y eliminar la última sesión de un día sin mostrar cero minutos.
+
+
+## Arranque y selector de duración (2026-09-21)
+
+- El tiempo abre un modal con valores rápidos y rueda de 1–180 minutos; guardar confirma, cancelar descarta.
+- La pantalla nativa usa `assets/splash-halo.png`, generada por `scripts/generate-splash.py` a partir de la geometría de ClockFace. El mismo halo gira durante la carga y se desvanece al terminar, respetando Reducir movimiento.
+- Pendiente en una nueva build de distribución iOS: arranque en frío sin salto entre imagen nativa y halo, con tema claro/oscuro y Reducir movimiento; probar también la inercia de la rueda, VoiceOver, tamaños de texto grandes y orientación. Expo Go y la vista web no validan la pantalla nativa de lanzamiento.
+- Verificado: comprobación de tipos, 27 pruebas unitarias y 37 escenarios Playwright aprobados; exportación del bundle iOS correcta. Revisión visual web en vertical y horizontal, con Guardar y Cancelar siempre accesibles. La exportación no sustituye la prueba nativa pendiente.
+
+
+## Android y atenuación de pantalla (2026-09-21)
+
+- El arranque con halo y el modal de duración usan los mismos componentes y configuración en Android e iOS. La pantalla inicial que dibuja el sistema debe revisarse en builds de distribución de ambas plataformas.
+- Nueva preferencia `dimScreen`, desactivada por defecto y validada al restaurar preferencias. Tras 10 segundos sin tocar durante la sesión, aplica como máximo un 12 % de brillo, sin aumentar un brillo que ya fuese inferior. Un primer toque solo recupera el brillo y reinicia la espera.
+- Las escrituras nativas se serializan: pausar o salir durante una escritura pendiente restaura después de esa escritura. Se restaura al tocar, pausar, completar, desactivar la opción, salir de primer plano o desmontar. Android usa brillo de la actividad y recupera el modo del sistema; no se modifica el brillo global ni se solicitan permisos para modificarlo. iOS evita sobrescribir un nivel que haya cambiado después de la atenuación.
+- No molestar ya estaba disponible en Ajustes → Sin interrupciones en Android instalado, con permisos de política de notificaciones y alarmas exactas. iOS conserva las instrucciones para activar Concentración manualmente.
+- Pendiente en dispositivos: brillo real y restauración, bloqueo/desbloqueo, Centro de control/ajustes rápidos, brillo automático, salida a otra app, VoiceOver/TalkBack, pulsar sobre Pausa con la pantalla atenuada, y completar en segundo plano. Las pruebas web usan una capa oscura y no verifican el brillo físico ni No molestar. Hace falta una nueva build para incorporar `expo-brightness`.
+- Verificado: tipos, 32 pruebas unitarias y 39 escenarios Playwright aprobados; exportación de los bundles Android e iOS correcta. No se ha generado ni instalado un binario de distribución.

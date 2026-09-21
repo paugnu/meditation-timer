@@ -119,5 +119,13 @@
   "Se aplica al gong y al sonido de fondo.": "Действует и для гонга, и для фонового звука.",
   "Sin permiso de avisos, el gong solo suena con la app abierta.": "Без разрешения на уведомления гонг звучит только при открытом приложении.",
   "Permitir avisos": "Разрешить уведомления",
-  "Pidiendo permiso…": "Запрашиваем разрешение…"
+  "Pidiendo permiso…": "Запрашиваем разрешение…",
+  "Guardar duración": "Сохранить длительность",
+  "Reducir duración": "Уменьшить длительность",
+  "Aumentar duración": "Увеличить длительность",
+  "Atenuar pantalla": "Затемнять экран",
+  "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.": "Уменьшает яркость через 10 секунд без касаний во время медитации. Коснитесь экрана, чтобы восстановить яркость.",
+  "Recuperar brillo": "Восстановить яркость",
+  "Toca para recuperar el brillo": "Коснитесь, чтобы восстановить яркость",
+  "No se ha podido ajustar el brillo de la pantalla.": "Не удалось изменить яркость экрана."
 }

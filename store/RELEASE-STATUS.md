@@ -210,3 +210,13 @@ Pendiente y no hecho aquí:
   La build 8 se subió por EAS Submit y nunca se seleccionó. Falta iniciar sesión, elegir la build
   nueva, actualizar capturas y enviar.
 - Google Play: la ficha muestra capturas de la build 8, con la cabecera que ya no existe.
+
+
+## 2026-09-21 · Preparación de 1.5.0 (14)
+
+- Pau autoriza commit, push y envío a ambas tiendas.
+- EAS confirma versiones posteriores al último registro local: Android 1.4.0 (12), build `7580ac22-32fe-4a12-b939-5e786225db8c`, e iOS 1.4.0 (13), build `19558300-67bd-4620-9573-61ec1c9339ac`, ambas FINISHED. Esto confirma compilación, no su estado de publicación.
+- Nueva entrega 1.5.0 (14) en ambas plataformas: halo de arranque y transición, modal de duración con valores rápidos y rueda, atenuación opcional y recuperación al tocar. No molestar ya existente en Android se conserva.
+- Verificados tipos, 32 pruebas unitarias, 39 escenarios Playwright y exportación de bundles Android/iOS. Brillo físico y arranque nativo pendientes de prueba en dispositivos.
+- Perfil `release` conserva los números explícitos del commit; envío `production` preparado para las tiendas, sin modificar el canal de pruebas.
+- Compilación y envío todavía pendientes. Google Play accesible; App Store Connect solicita iniciar sesión para el envío a revisión.
