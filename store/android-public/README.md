@@ -3,9 +3,12 @@
 Prepared 2026-09-06 for Meditation Timer · YogaBond, package com.pau.meditationtimer.
 
 - `feature-graphic.png`: 1024×500, original app halo/circle icon and Raleway composition; AI-assisted graphic design.
-- `screenshots/phone-*.png`: regenerated 2026-09-08 by `npx tsx scripts/capture-screenshots.ts` at
-  1080×1920 (viewport 360×640, deviceScaleFactor 3). Rendered straight to the store size, so unlike
+- `screenshots/phone-*.png`: regenerated 2026-09-08 from the production web export by `BASE_URL=http://127.0.0.1:8082 npx tsx scripts/capture-screenshots.ts` at
+  1080×2400 (viewport 360×800, deviceScaleFactor 3). Rendered straight to the store size, so unlike
   the earlier set they are not upscaled. Spanish, dark theme, empty local history.
+- Eight current views: timer (rain), ambience-waves, ambience-wind, ambience-birds, running, paused,
+  settings, calendar. The taller viewport keeps the settings gear visible. Updated after integration
+  of the four real CC0 recordings; captures are not uploaded by this regeneration.
 - `screenshots/phone-*.jpg` and `phone-timer-name8.*`: the previous set, captured at 432×768 and
   scaled up. Kept as the record of what was uploaded with build 8; do not reuse them.
 - Still web captures: the browser draws its own switches and scrollbars (the active switch shows a

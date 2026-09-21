@@ -60,7 +60,7 @@ the tested ones), all effects and orchestration in `src/hooks/useMeditation.ts`,
   duration) so it swells out of the decay, and completion drops the ambience as the closing gong
   rings. That hold is computed during render — set from an effect it is still stale on the commit
   that starts the session, and the ambience slips in ahead of the gong.
-- **Locales stay in lockstep.** Six dictionaries, 112 keys each, identical interpolation tokens; a test
+- **Locales stay in lockstep.** Six dictionaries, 119 keys each, identical interpolation tokens; a test
   enforces it. Spanish source strings are the keys, so changing Spanish copy means updating all six files.
   Catalan is the Valencian variant — follow [docs/VALENCIAN.md](docs/VALENCIAN.md).
 - **A running session offers one control.** `Finalizar` appears only when paused or completed, so
@@ -71,15 +71,19 @@ the tested ones), all effects and orchestration in `src/hooks/useMeditation.ts`,
 - **Store-facing config is deliberate, not default.** `blockedPermissions` strips `RECORD_AUDIO`
   and `SYSTEM_ALERT_WINDOW` (the latter arrives with `expo-dev-client` and has no business in a
   meditation timer); the splash background is `#181613` because the app's first frame is dark in
-  either theme; `enableProguardInReleaseBuilds` exists so the AAB carries a mapping file for Play.
+  either theme; `enableMinifyInReleaseBuilds` exists so the AAB carries a mapping file for Play.
   Verify these in the built AAB, not in `expo prebuild` output alone.
 - **Failures surface as a dismissible notice, never as a blocked meditation.** Permissions denied, audio
   unavailable, storage unwritable: warn and keep going.
 
 ## Working here
 
+- Work only on `main` in this project. Do not create feature branches or separate worktrees.
+  Fetch and integrate `origin/main` before starting, preserving any uncommitted work. Finish authorized
+  changes with verification, commit and push to `origin/main`; confirm the working tree is clean and
+  local and remote commits match. Do not leave completed changes only on this machine.
 - Verify with `npm run typecheck && npm test` (27 unit tests, node:test via tsx) and, for UI changes,
-  `npm run test:e2e` (32 Playwright scenarios against the web build; needs Chrome). Occasional startup
+  `npm run test:e2e` (35 Playwright scenarios against the web build; needs Chrome). Occasional startup
   flake under full parallelism passes on a serial rerun.
 - Style is deliberately dense: compact modules, inline JSX styling, comments only where an invariant is
   non-obvious. Match it rather than reformatting.

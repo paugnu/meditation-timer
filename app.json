@@ -2,7 +2,7 @@
   "expo": {
     "name": "Meditation Timer · YogaBond",
     "slug": "meditation-timer",
-    "version": "1.2.0",
+    "version": "1.4.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -13,7 +13,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "9"
+      "buildNumber": "13"
     },
     "android": {
       "package": "com.pau.meditationtimer",
@@ -30,7 +30,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.SYSTEM_ALERT_WINDOW"
       ],
-      "versionCode": 9
+      "versionCode": 12
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -72,7 +72,7 @@
         "expo-build-properties",
         {
           "android": {
-            "enableProguardInReleaseBuilds": true
+            "enableMinifyInReleaseBuilds": true
           }
         }
       ]

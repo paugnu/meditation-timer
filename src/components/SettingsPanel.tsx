@@ -8,6 +8,7 @@ import { COLORS, Settings } from '../settings';
 import { focus } from '../services/focus';
 import { alertsGranted, prepareAlerts } from '../services/alerts';
 import { Icon } from './Icon';
+import { soundCredits } from '../soundCredits';
 import { MeditationRecord } from '../history';
 import { HistoryPanel } from './HistoryPanel';
 
@@ -19,6 +20,7 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
   const palette = appTheme(settings);
   const { text, muted, line, accent } = palette;
   const [section, setSection] = useState<'settings' | 'history'>('settings');
+  const [showCredits, setShowCredits] = useState(false);
   const [minutes, setMinutes] = useState(String(settings.minutes));
   const [error, setError] = useState('');
   const [soundError, setSoundError] = useState('');
@@ -55,6 +57,7 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
       if (!(await testSound())) setSoundError('No se ha podido reproducir el gong. Comprueba el volumen y vuelve a intentarlo.');
     } finally { setTestingSound(false); }
   };
+  const openCredit = (url: string) => { void Linking.openURL(url).catch(() => setError('No se ha podido abrir el enlace.')); };
   const heading = (label: string) => <Text maxFontSizeMultiplier={1.4} style={[styles.sectionTitle, { color: muted }]}>{label}</Text>;
   const toggle = (label: string, value: boolean, onChange: (v: boolean) => void, detail?: string) =>
     <View style={[styles.row, { borderColor: line }]}>
@@ -126,7 +129,10 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
             <Text style={[styles.detail, { color: muted }]}>{access && exact ? t("Permisos concedidos.") : t("Concede ambos permisos para activar y restaurar No molestar automáticamente.")}</Text>
           </> : <Text maxFontSizeMultiplier={1.6} style={[styles.paragraph, { color: muted }]}>{Platform.OS === 'ios' ? t("Antes de empezar, activa No molestar desde el Centro de control → Concentración. iOS no permite que la app lo active automáticamente. Permite los avisos de esta app si quieres escuchar el gong con la pantalla bloqueada.") : Platform.OS === 'android' ? t("No molestar automático está disponible en la versión Android instalada, fuera de Expo Go. Mientras tanto, actívalo desde los ajustes rápidos del teléfono.") : t("En esta vista web, activa No molestar en tu dispositivo. Para escuchar el gong, mantén esta pestaña abierta; los avisos con la pantalla bloqueada están disponibles en Android e iOS.")}</Text>}
           {Platform.OS !== 'web' && button(t("Abrir ajustes de la aplicación"), () => { void Linking.openSettings().catch(() => setError('No se han podido abrir los ajustes del dispositivo.')); })}
-          <View style={[styles.footer, { borderColor: line }]}><Text style={{ color: text, fontSize: 14 }}>Meditation Timer · YogaBond</Text><Text style={[styles.detail, { color: muted }]}>{t("Tu tiempo. Tu práctica.")}</Text><Pressable accessibilityRole="link" accessibilityLabel={t('Una app de YogaBond')} onPress={() => { void Linking.openURL('https://www.yogabond.es/').catch(() => setError('No se ha podido abrir la web de YogaBond.')); }} style={styles.linkButton}><Text style={{ color: accent, fontSize: 14 }}>{t('Una app de YogaBond')} ↗</Text></Pressable>{[['Política de privacidad', 'privacy#meditation-timer'], ['Ayuda y contacto', '#meditation-timer-support']].map(([label, path]) => <Pressable key={label} accessibilityRole="link" accessibilityLabel={t(label)} onPress={() => { void Linking.openURL(`https://www.yogabond.es/${settings.language}${path.startsWith('#') ? '' : '/'}${path}`).catch(() => setError('No se ha podido abrir la web de YogaBond.')); }} style={styles.linkButton}><Text style={{ color: accent, fontSize: 14 }}>{t(label)} ↗</Text></Pressable>)}<Text style={[styles.detail, { color: muted, marginTop: 12 }]}>{t("Sin anuncios, cuentas ni meditaciones guiadas.")}{"\n"}{t("Tus preferencias y meditaciones se guardan en este dispositivo.")}</Text></View>
+          <View style={[styles.footer, { borderColor: line }]}><Text style={{ color: text, fontSize: 14 }}>Meditation Timer · YogaBond</Text><Text style={[styles.detail, { color: muted }]}>{t("Tu tiempo. Tu práctica.")}</Text><Pressable accessibilityRole="link" accessibilityLabel={t('Una app de YogaBond')} onPress={() => { void Linking.openURL('https://www.yogabond.es/').catch(() => setError('No se ha podido abrir la web de YogaBond.')); }} style={styles.linkButton}><Text style={{ color: accent, fontSize: 14 }}>{t('Una app de YogaBond')} ↗</Text></Pressable>{[['Política de privacidad', 'privacy#meditation-timer'], ['Ayuda y contacto', '#meditation-timer-support']].map(([label, path]) => <Pressable key={label} accessibilityRole="link" accessibilityLabel={t(label)} onPress={() => { void Linking.openURL(`https://www.yogabond.es/${settings.language}${path.startsWith('#') ? '' : '/'}${path}`).catch(() => setError('No se ha podido abrir la web de YogaBond.')); }} style={styles.linkButton}><Text style={{ color: accent, fontSize: 14 }}>{t(label)} ↗</Text></Pressable>)}<Text style={[styles.detail, { color: muted, marginTop: 12 }]}>{t("Sin anuncios, cuentas ni meditaciones guiadas.")}{"\n"}{t("Tus preferencias y meditaciones se guardan en este dispositivo.")}</Text>
+          <Pressable accessibilityRole="button" accessibilityState={{ expanded: showCredits }} onPress={() => setShowCredits(value => !value)} style={styles.linkButton}><Text style={{ color: accent, fontSize: 14 }}>{t('Créditos de sonido')}</Text></Pressable>
+          {showCredits && <View><Text style={[styles.detail, { color: muted }]}>{t('Adaptados para reproducción en bucle y volumen equilibrado.')}</Text>{soundCredits.map(credit => <View key={credit.url} style={{ marginTop: 12 }}><Pressable accessibilityRole="link" onPress={() => openCredit(credit.url)} style={styles.linkButton}><Text style={{ color: accent, fontSize: 13 }}>{credit.title} — {credit.author} ↗</Text></Pressable><Pressable accessibilityRole="link" onPress={() => openCredit(credit.licenseUrl)} style={styles.linkButton}><Text style={{ color: muted, fontSize: 12 }}>{credit.license} ↗</Text></Pressable></View>)}</View>}
+          </View>
         </ScrollView>}
       </View>
     </SafeAreaView>

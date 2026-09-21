@@ -4,8 +4,14 @@ import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { AmbienceId } from '../ambience';
 
 const sources: Partial<Record<AmbienceId, number>> = {
-  rain: require('../../assets/ambience/rain.wav'),
-  waves: require('../../assets/ambience/waves.wav'),
+  rain: require('../../assets/ambience/rain.m4a'),
+  waves: require('../../assets/ambience/waves.m4a'),
+  wind: require('../../assets/ambience/wind.m4a'),
+  birds: require('../../assets/ambience/birds.m4a'),
+  storm: require('../../assets/ambience/storm.m4a'),
+  chimes: require('../../assets/ambience/chimes.m4a'),
+  brown: require('../../assets/ambience/brown.m4a'),
+  tanpura: require('../../assets/ambience/tanpura.m4a'),
 };
 const FADE_MS = 1500, STEP_MS = 50;
 

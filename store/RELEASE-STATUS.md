@@ -210,3 +210,93 @@ Pendiente y no hecho aquí:
   La build 8 se subió por EAS Submit y nunca se seleccionó. Falta iniciar sesión, elegir la build
   nueva, actualizar capturas y enviar.
 - Google Play: la ficha muestra capturas de la build 8, con la cabecera que ya no existe.
+
+## 2026-09-08 · Estado real de iOS y revisión de cambios remotos
+
+- Tras recuperar la sesión de Apple, se confirmó que 1.1.0 (7) seguía en Waiting for Review.
+- Se canceló el envío para sustituirlo. Apple confirmó **Developer Rejected**, una retirada solicitada por nosotros, no un rechazo de Apple.
+- El usuario cambió la tarea a recuperar y revisar el repositorio antes de seleccionar/reenviar otro build. **Actualmente no queda ese envío esperando revisión.** Build 8 sigue subido, pero no seleccionado ni reenviado.
+- Recuperado `origin/main` mediante fast-forward a `fb2cf04`, sin conflictos ni cambios locales previos. Contiene la futura 1.2.0 (9).
+- Sustituidos dos WAV sintéticos por cuatro grabaciones CC0 estéreo: lluvia, mar, viento y pájaros al amanecer. Fuentes/licencias, edición reproducible y hashes en `assets/ambience/`. Sin envío a tiendas en esta tarea.
+- Corregido `enableProguardInReleaseBuilds` por `enableMinifyInReleaseBuilds`, que es la opción efectiva en Expo SDK 57. La introspección confirma `android.enableMinifyInReleaseBuilds=true`; el AAB final aún requiere validación nativa.
+- Validación de esta tarea: TypeScript, 27 pruebas de lógica y 33 escenarios web correctos; repetida con éxito la prueba de los cuatro bucles después de la edición final de lluvia. Revisión y límites en `docs/REVIEW-2026-09-08.md`.
+
+## 2026-09-08 · Capturas actualizadas con los cuatro ambientes
+
+- Generadas y revisadas visualmente 24 capturas PNG originales de Chrome sobre la exportación web de producción, sin indicadores de Expo, retoques ni reescalado.
+- Ocho vistas por formato: lluvia, olas, viento, pájaros, ejecución, pausa, ajustes y calendario. Registro vacío; la sesión real de prueba se descartó.
+- Android 1080×2400; iPhone 1242×2688; iPad 2048×2732. ZIP, hojas de contacto y manifiesto SHA-256 en `store/captures-2026-09-08/`.
+- Actualizado el script reproducible `scripts/capture-screenshots.ts`. Son capturas web, no nativas. No se han subido ni se ha enviado otra versión a las tiendas en esta tarea.
+
+## 2026-09-08 · Compilación y subida 1.2.0 (10)
+
+- Solicitada compilación EAS para ambas plataformas con perfil `testing` (distribución store). Incrementados los contadores locales a 10.
+- Android terminado: `e33cb84c-a3de-4ae7-b894-c60961a759e9`, versión 1.2.0 (10). AAB descargado en `/tmp/meditation-timer-1.2.0-10.aab`, SHA-256 `1a177cb040ba902fe79fb81c12d0c9b0cf17dbb5f64ffe4f35bdcad943800673`.
+- Validación del AAB: nombre completo presente en recursos, paquete y versión correctos; cuatro M4A idénticos por SHA-256 a los originales preparados; mapping R8 incluido; ausentes RECORD_AUDIO, SYSTEM_ALERT_WINDOW y FOREGROUND_SERVICE. No sustituye una prueba de ejecución nativa en dispositivo.
+- Google Play: guardadas descripción con cuatro ambientes y ocho capturas nuevas de teléfono. Subido AAB 10 a un nuevo borrador de producción, excluyendo el 8. Estado de envío final pendiente de confirmar más abajo.
+- **iOS bloqueado:** EAS rechazó crear la compilación por agotamiento del cupo gratuito mensual, renovación indicada el 1 de octubre de 2026. No existe compilación iOS 1.2.0 (10) terminada ni enviada. Solicitado al usuario ampliar el plan si desea compilar antes; no se ha contratado ningún plan.
+- Sesión de App Store Connect caducada; solicitado inicio de sesión. Sigue pendiente sustituir el envío retirado y actualizar las capturas de Apple.
+- **Envío Android confirmado:** pulsados «Enviar 3 cambios a revisión» y «Reiniciar revisión». Google muestra **Cambios en revisión** para **1.2.0 (10) · Sonidos ambiente**, junto con ficha actualizada y declaraciones existentes. Sustituye el envío de la build 8 y reinicia su plazo. Comprobaciones rápidas automáticas aún en curso (hasta 14 minutos); no equivale a aprobación ni disponibilidad pública.
+- Única advertencia de validación: aumento del tamaño de descarga por los ambientes. Google estima 38 MB para nuevas descargas; sin pérdida de dispositivos admitidos. Publicación gestionada desactivada, lanzamiento al 100 % tras aprobación.
+
+## 2026-09-09 · Android publicado e iOS reanudado
+
+- Verificado en Play Console: última publicación el 8 de septiembre; producción **Activa**, última versión **1.2.0 (10) · Sonidos ambiente**, 177 países/regiones. Ya no hay cambios pendientes en Resumen de publicación.
+- El usuario recibe un aviso IARC «Live Rating Notice»: clasificaciones generadas a partir del cuestionario, no un rechazo. El correo por sí solo no acredita publicación; el estado anterior se comprobó directamente en Play Console.
+- Tras confirmar el usuario la ampliación de Expo, EAS acepta iOS **1.2.0 (11)**, build `eec31a79-8eab-4d75-ad55-c455a91c1012`. El contador iOS sube de 10 a 11, Android permanece 10.
+- Programada subida a Apple mediante EAS Submit `63609d42-8b35-44da-8a2c-881a9026ab64`, a la espera de terminar la compilación. Programación no equivale a subida terminada ni envío a App Review.
+- Solicitado inicio de sesión en App Store Connect para completar ficha, capturas y revisión pública.
+- Recuperada la sesión de Apple durante la tarea. Guardada ficha **1.2.0**, descripción con ambientes y notas de revisión; retirado el vínculo a build 7. Tras recargar, estado **Prepare for Submission** y sin build seleccionada, esperando la nueva.
+- Subidas ocho capturas nuevas por dispositivo (iPhone 6.5 pulgadas e iPad 13 pulgadas); temporizador movido a primera posición. Son las capturas originales de Chrome preparadas el 8 de septiembre, no capturas nativas.
+- Compilación iOS **FINISHED**, IPA descargado en `/tmp/meditation-timer-1.2.0-11.ipa`; SHA-256 `8eeeefdc9e443eb5aaafc4cb88a86c1ff1de73197f6157046f99079ab3feed22`. Verificados CFBundleDisplayName completo, identificador, versión 1.2.0, build 11 y los cuatro M4A idénticos por SHA-256. Sin UIBackgroundModes, coherente con ambientes solo en primer plano. Validación del paquete, no prueba en dispositivo.
+- EAS Submit ha empezado a transferir la build a App Store Connect. La validación de ficha de Apple solo exige elegir una build; las capturas y demás metadatos cumplen los requisitos de formulario.
+- **Subida iOS confirmada:** EAS Submit informa «Successfully uploaded the new binary to App Store Connect». TestFlight confirma **Version 1.2.0, Build (11): Processing**, creada el 9 de septiembre a las 16:45 (hora local). No se ha enviado todavía a revisión pública: Apple aún no permite seleccionar la build en procesamiento.
+- **Envío público iOS confirmado:** Apple terminó de procesar la build 11, seleccionada y guardada en la ficha 1.2.0. Pulsados «Add for Review» y «Submit for Review»; confirmación **1 Item Submitted**, borradores 0. Envío `aa6459e7-3439-48c6-9125-60e92790d45c` en https://appstoreconnect.apple.com/apps/6809041268/distribution/reviewsubmissions/details/aa6459e7-3439-48c6-9125-60e92790d45c . Publicación automática tras aprobación seleccionada. Pendiente de revisión, no aprobado ni publicado todavía.
+
+## 2026-09-12 · Selección de siete ambientes y versión 1.3.0
+
+- Integradas las siete grabaciones elegidas por el usuario: lluvia B, mar A, viento C, pájaros A, campanas C, ruido marrón C y tormenta T8 de MrAuralization, titulada «Tormenta lejana».
+- Audio local sin conexión; nivel equilibrado y unión circular. Créditos y enlaces de licencia en Ajustes (seis Pixabay Content License y una CC BY 4.0); fuentes, adaptaciones y hashes en `assets/ambience/`.
+- Verificación: TypeScript, 27 pruebas de lógica y 34 escenarios web correctos, incluidos los siete bucles y los créditos. Comprobaciones numéricas de clipping, padding y discontinuidad correctas. No sustituye una prueba nativa en dispositivo.
+- Confirmado por App Store Connect API: iOS 1.2.0 (11) ya está READY_FOR_SALE. Recuperado acceso mediante la clave existente de EAS Submit; no es necesario iniciar sesión web para tramitar esta versión.
+- Compilaciones EAS solicitadas: Android 1.3.0 (11), `d387f77e-2172-4c74-ac07-adc74a917f0f`; iOS 1.3.0 (12), `a6e6efa0-c7c4-496f-b395-0f5d31f9a104`. Subida iOS programada `f152854a-0e03-4db5-ab51-2570e8abbb5c`.
+- Creada ficha iOS 1.3.0 por API, con descripción/novedades/notas actualizadas, contactos de revisión conservados y ocho capturas existentes por dispositivo. Publicación automática tras aprobación. Google Play: descripción guardada y borrador de producción 1.3.0 (11) preparado, pendiente del AAB.
+- iOS EAS FINISHED; verificado IPA 1.3.0 (12), identificador y nombre correctos, siete M4A idénticos por SHA-256 y sin UIBackgroundModes. SHA-256 del IPA: `5a06cbc62a0a015b1f8ed339d8f3ec0444dff8c238c274035879a7fda537e25c`. Subida a Apple en curso; todavía no enviado a revisión.
+- **iOS enviado a App Review por API:** build 12 válida asociada a 1.3.0; envío `b1589fcb-87c5-4110-8397-a6e57318249f`, confirmado WAITING_FOR_REVIEW el 12 de septiembre a las 07:37 (hora local). No aprobado todavía.
+- Android EAS FINISHED; AAB 1.3.0 (11) verificado: siete M4A idénticos por SHA-256, paquete/nombre correctos, splash #181613, mapping R8 presente y sin RECORD_AUDIO, SYSTEM_ALERT_WINDOW ni FOREGROUND_SERVICE. SHA-256: `07b050b6e69e1314c3cbe4d6bfbd5ed8feacb25fae0c27b1a284b164c8e62233`. Subida a Google Play en curso.
+- **Android enviado:** confirmados «Enviar 2 cambios a revisión» y «Enviar cambios a revisión». Play Console muestra **Cambios en revisión** para 1.3.0 (11) y descripción actualizada. Comprobaciones rápidas en curso (hasta 14 minutos); publicación gestionada desactivada, lanzamiento al 100 % en los países actuales tras aprobación. No aprobado ni publicado todavía.
+- Google Play estima 70,1 MB de descarga (+32 MB); única advertencia por tamaño, sin pérdida de dispositivos compatibles.
+
+## 2026-09-13 · Tanpura elegida y fundidos sin gong
+
+- Seleccionada la grabación de Maxwell Flowers en Insight Timer (09:59). Pendiente del permiso escrito de redistribución exigido por la fuente y del archivo de audio; no incorporada ni publicada. Selección y borrador de solicitud no enviado en `store/TANPURA-SELECTION.md`.
+- Confirmado que los fundidos existentes funcionan con ambos gongs desactivados. Añadido escenario web que mide niveles intermedios de entrada/salida hasta silencio al completar, y ausencia de gong. No ha sido necesario cambiar el motor de reproducción.
+- TypeScript, 27 pruebas de lógica y 35 escenarios web correctos. Sin nueva compilación ni envío a tiendas; no es una prueba nativa en dispositivo.
+
+## 2026-09-13 — Tanpura added locally
+
+- Added the user-selected “Electronic Tanpuar 4” by sankalp (Freesound 155497, CC BY 4.0) as the eighth ambience, Tanpura. Bundled HQ-preview-derived AAC, with attribution and adaptation notice in Settings and source documentation.
+- Removed the initial silence and final decay; matched pluck envelopes and used a 12-second crossfade to create a 239.932-second loop. Decoded audio has no padding or clipping; the quietest 100 ms is −29.89 dBFS. Seam preview: `store/audio-previews/tanpura-loop-seam.wav` (join at 6 s).
+- Validation: TypeScript and all 27 unit tests pass; all 35 Playwright tests pass, including eight-file loop playback, Tanpura persistence, credits, and Tanpura fade-in/out with both gongs disabled.
+- This addition has not been built or submitted to stores. Native iOS/Android loop playback still needs device verification; the previously submitted release does not contain Tanpura.
+
+## 2026-09-13 · 1.4.0 con Tanpura para TestFlight y pruebas internas
+
+- El usuario autoriza subir a TestFlight y Android. Se prepara el canal interno de Google Play, conservando la publicación pública 1.3.0.
+- Estado previo confirmado: iOS 1.3.0 (12) READY_FOR_SALE; Android 1.3.0 (11) publicado al 100 %, sin cambios pendientes.
+- Compilaciones EAS testing solicitadas: Android 1.4.0 (12), `7580ac22-32fe-4a12-b939-5e786225db8c`; iOS 1.4.0 (13), `19558300-67bd-4620-9573-61ec1c9339ac`. Ambas aceptadas y en curso; todavía sin subida a las tiendas.
+- iOS EAS FINISHED. IPA 1.4.0 (13) verificado: identificador/nombre correctos, ocho M4A idénticos por SHA-256 y sin UIBackgroundModes. SHA-256 del IPA: `d07606b142ba18593b445b558a8af7a28ef5716270780dda6f3d69359baf460b`.
+- Subida iOS programada: `92746038-ba39-47c2-91df-88889bc48e0b`. El primer intento con notas de prueba fue rechazado antes de crear la subida por una restricción de plan de EAS; el segundo, sin ese parámetro, fue aceptado. No se ha cambiado el plan.
+- **TestFlight disponible:** EAS Submit FINISHED; Apple build `c09f077f-400e-4e38-be3c-0cd14b6a4582` (13) VALID e internalBuildState IN_BETA_TESTING. Grupo existente «Pruebas internas» con acceso automático a todas las builds. Notas de prueba es-ES guardadas por App Store Connect API. No se ha enviado 1.4.0 a App Review público.
+- Android EAS FINISHED. AAB 1.4.0 (12) verificado: ocho M4A idénticos por SHA-256, paquete y versión correctos, mapping R8 incluido, sin RECORD_AUDIO, SYSTEM_ALERT_WINDOW ni FOREGROUND_SERVICE. Subida iniciada a la versión 5 del canal interno de Google Play.
+- SHA-256 del AAB 1.4.0 (12): `abaf7f4df4c3863755d0f6e5a089977b03be17487131299965144f107b28affb`. Google Play procesó el paquete sin errores: única advertencia por tamaño (73,6 MB; comparado con la antigua build 7 del canal interno), sin pérdida de dispositivos compatibles.
+- **Android disponible para testers internos:** confirmados «Guardar y publicar» y el diálogo final. Google Play muestra canal Activo, última versión **1.4.0 (12) · Tanpura**, **Disponible para testers internos**, publicada el 13 de septiembre a las 06:42. Enlace de acceso del canal: https://play.google.com/apps/internaltest/4701601392540903008 . Puede tardar en propagarse a los dispositivos.
+- Objetivo completado: TestFlight 1.4.0 (13) y Google Play interno 1.4.0 (12). La versión pública continúa siendo 1.3.0. Validación de paquetes y subida, no prueba de reproducción en dispositivo.
+
+## 2026-09-13 · Publicación de 1.4.0 autorizada en ambas tiendas
+
+- El usuario autoriza publicar la app en todas las stores. Se reutilizan las compilaciones verificadas de TestFlight y Google Play interno, sin nueva compilación.
+- **iOS enviado a App Review:** ficha 1.4.0 `8ab6eaef-e984-4819-b397-08b45f24ead3`, build 13 `c09f077f-400e-4e38-be3c-0cd14b6a4582`. Descripción y notas actualizadas con Tanpura, ocho capturas conservadas por dispositivo. Publicación AFTER_APPROVAL. Envío `9f615fed-58c6-4152-8078-ef351ced07e5`, confirmado WAITING_FOR_REVIEW. Todavía no aprobado ni publicado.
+- Android: promovida build 12 desde pruebas internas al borrador de producción 1.4.0 (12) · Tanpura, versión de canal 5. Validación sin incidencias, sin pérdida de dispositivos; lanzamiento al 100 % en todos los países de destino actuales. Guardado, pendiente de enviar a revisión.
+- **Android enviado a revisión:** descripción actualizada a ocho sonidos, incluida Tanpura. Confirmados «Enviar 2 cambios a revisión» y «Enviar cambios a revisión». Google Play muestra **Cambios en revisión** para producción 1.4.0 (12) y la ficha es-ES. Comprobaciones rápidas en curso (hasta 14 minutos); publicación gestionada desactivada, lanzamiento completo tras aprobación. No equivale a aprobación ni disponibilidad pública.
+- Envíos públicos completados en ambas tiendas. App Store 1.4.0 (13): WAITING_FOR_REVIEW y AFTER_APPROVAL, enviado 2026-09-13T04:58:32Z. Google Play 1.4.0 (12): Cambios en revisión. La aprobación depende de cada tienda.

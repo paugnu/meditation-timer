@@ -394,18 +394,16 @@ test('background sound steps both ways, wraps around, and persists', async ({ pa
   const label = page.getByTestId('ambience-label');
   const next = page.getByTestId('ambience-forward');
   await expect(label).toHaveText('Sin sonido de fondo');
-  await next.click();
-  await expect(label).toHaveText('Lluvia suave');
-  await next.click();
-  await expect(label).toHaveText('Olas del mar');
-  await next.click();
-  await expect(label).toHaveText('Sin sonido de fondo');
+  for (const name of ['Lluvia suave', 'Olas del mar', 'Viento', 'Pájaros al amanecer', 'Tormenta lejana', 'Campanas de viento', 'Ruido marrón', 'Tanpura', 'Sin sonido de fondo']) {
+    await next.click();
+    await expect(label).toHaveText(name);
+  }
   await page.getByTestId('ambience-back').click();
-  await expect(label).toHaveText('Olas del mar');
+  await expect(label).toHaveText('Tanpura');
   await page.reload();
-  await expect(label).toHaveText('Olas del mar');
+  await expect(label).toHaveText('Tanpura');
   const data = await page.evaluate(k => JSON.parse(localStorage.getItem(k)!), key);
-  expect(data.settings.ambience).toBe('waves');
+  expect(data.settings.ambience).toBe('tanpura');
   await expect(page.getByTestId('countdown')).toHaveText('20:00');
   const plays = () => page.evaluate(() => (window as unknown as { plays: string[] }).plays.length);
   expect(await plays()).toBe(0);
@@ -559,4 +557,80 @@ test('landscape keeps the start button and the controls on screen', async ({ pag
   const halo = await page.getByTestId('meditation-halo').boundingBox();
   const countdown = await page.getByTestId('countdown').boundingBox();
   expect(halo!.x + halo!.width, 'columns overlap').toBeLessThanOrEqual(countdown!.x);
+});
+
+test('all eight selected recordings load and continue across a loop boundary', async ({ page }) => {
+  await page.addInitScript(k => {
+    localStorage.setItem(k, JSON.stringify({ settings: { minutes: 20, gong: false, gongStart: false } }));
+    const media: HTMLMediaElement[] = [];
+    (window as unknown as { ambienceMedia: HTMLMediaElement[] }).ambienceMedia = media;
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      if (!media.includes(this)) media.push(this);
+      return play.apply(this);
+    };
+  }, key);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  for (const name of ['rain', 'waves', 'wind', 'birds', 'storm', 'chimes', 'brown', 'tanpura']) {
+    await page.getByTestId('ambience-forward').click();
+    await expect.poll(() => page.evaluate(name => {
+      const audio = (window as unknown as { ambienceMedia: HTMLMediaElement[] }).ambienceMedia.find(m => m.src.includes(name));
+      return !!audio && audio.duration > 90 && audio.loop && !audio.paused && !audio.error;
+    }, name)).toBe(true);
+    await page.evaluate(name => {
+      const audio = (window as unknown as { ambienceMedia: HTMLMediaElement[] }).ambienceMedia.find(m => m.src.includes(name))!;
+      audio.currentTime = audio.duration - .3;
+    }, name);
+    await expect.poll(() => page.evaluate(name => {
+      const audio = (window as unknown as { ambienceMedia: HTMLMediaElement[] }).ambienceMedia.find(m => m.src.includes(name))!;
+      return audio.currentTime < 3 && !audio.paused && !audio.error;
+    }, name)).toBe(true);
+  }
+});
+
+
+test('sound credits expose the selected recordings and attribution licence', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes', exact: true }).click();
+  await page.getByRole('button', { name: 'Créditos de sonido', exact: true }).click();
+  await expect(page.getByRole('link', { name: /Rain with distant thunder.*MrAuralization/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Electronic Tanpuar 4.*sankalp/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /CC BY 4.0/ })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: /Pixabay Content License/ })).toHaveCount(6);
+  await page.getByRole('button', { name: 'Créditos de sonido', exact: true }).click();
+  await expect(page.getByRole('link', { name: /CC BY 4.0/ })).toHaveCount(0);
+});
+
+test('with both gongs disabled the ambience fades in and fades out on completion', async ({ page }) => {
+  await page.addInitScript(k => {
+    localStorage.setItem(k, JSON.stringify({ settings: { minutes: 1, ambience: 'tanpura', volume: .5, gongStart: false, gong: false } }));
+    const samples: number[] = [];
+    (window as unknown as { fadeSamples: number[] }).fadeSamples = samples;
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      if (this.src.includes('tanpura')) {
+        samples.push(this.volume);
+        this.addEventListener('volumechange', () => samples.push(this.volume));
+      }
+      return play.apply(this);
+    };
+  }, key);
+  await page.addInitScript(spySources);
+  await page.goto('/');
+  const samples = () => page.evaluate(() => (window as unknown as { fadeSamples: number[] }).fadeSamples);
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await expect.poll(async () => (await samples()).at(-1)).toBe(.5);
+  const entrance = await samples();
+  expect(entrance[0]).toBeLessThan(.1);
+  expect(entrance.filter(v => v > .1 && v < .4).length).toBeGreaterThan(3);
+  const boundary = entrance.length;
+  await page.clock.setSystemTime(new Date(Date.now() + 61000));
+  await expect(page.getByText('SESIÓN COMPLETADA', { exact: true })).toBeVisible();
+  await expect.poll(async () => (await samples()).at(-1), { timeout: 6000 }).toBe(0);
+  const exit = (await samples()).slice(boundary);
+  expect(exit.filter(v => v > .1 && v < .4).length).toBeGreaterThan(3);
+  expect(exit.every((v, i) => i === 0 || v <= exit[i - 1])).toBe(true);
+  const gongs = await page.evaluate(() => (window as unknown as { sources: string[] }).sources.filter(s => !s.includes('tanpura')));
+  expect(gongs).toEqual([]);
 });

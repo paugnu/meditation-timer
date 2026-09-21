@@ -8,8 +8,10 @@ test('the selector cycles in both directions and always returns to silence', () 
   assert.equal(defaults.ambience, 'none');
   assert.equal(stepAmbience('none', 1), 'rain');
   assert.equal(stepAmbience('rain', 1), 'waves');
-  assert.equal(stepAmbience('waves', 1), 'none', 'a single arrow must reach silence again');
-  assert.equal(stepAmbience('none', -1), 'waves');
+  assert.equal(stepAmbience('tanpura', 1), 'none', 'a single arrow must reach silence again');
+  assert.equal(stepAmbience('none', -1), 'tanpura');
+  assert.equal(stepAmbience('waves', 1), 'wind');
+  assert.equal(stepAmbience('wind', 1), 'birds');
   assert.deepEqual(ambiences.map((_, index) => stepAmbience('none', index)), [...ambiences]);
   // Repeated swipes in one direction never leave the list.
   let id = validAmbience('none');
@@ -21,6 +23,7 @@ test('unknown or corrupt ambience falls back to silence and never autoplays', ()
   assert.equal(restoreSettings({ ambience: 'thunder' }).ambience, 'none');
   assert.equal(restoreSettings({ ambience: 'waves' }).ambience, 'waves');
   assert.equal(restoreSettings({}).ambience, 'none');
+  for (const ambience of ambiences) assert.equal(restoreSettings({ ambience }).ambience, ambience);
 });
 
 test('every ambience has a label translated into all six languages', () => {

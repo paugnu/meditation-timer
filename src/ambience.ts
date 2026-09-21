@@ -1,10 +1,16 @@
 /** Background ambiences. Order is the cycle order of the on-screen selector. */
-export const ambiences = ['none', 'rain', 'waves'] as const;
+export const ambiences = ['none', 'rain', 'waves', 'wind', 'birds', 'storm', 'chimes', 'brown', 'tanpura'] as const;
 export type AmbienceId = typeof ambiences[number];
 export const ambienceLabels: Record<AmbienceId, string> = {
   none: 'Sin sonido de fondo',
   rain: 'Lluvia suave',
   waves: 'Olas del mar',
+  wind: 'Viento',
+  birds: 'Pájaros al amanecer',
+  storm: 'Tormenta lejana',
+  chimes: 'Campanas de viento',
+  brown: 'Ruido marrón',
+  tanpura: 'Tanpura',
 };
 export function validAmbience(value: unknown): AmbienceId {
   return ambiences.includes(value as AmbienceId) ? value as AmbienceId : 'none';

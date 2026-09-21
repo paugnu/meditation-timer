@@ -119,5 +119,14 @@
   "Se aplica al gong y al sonido de fondo.": "Applies to both the gong and the background sound.",
   "Sin permiso de avisos, el gong solo suena con la app abierta.": "Without notification permission the gong only sounds while the app is open.",
   "Permitir avisos": "Allow notifications",
-  "Pidiendo permiso…": "Asking for permission…"
+  "Pidiendo permiso…": "Asking for permission…",
+  "Viento": "Wind",
+  "Pájaros al amanecer": "Dawn birdsong",
+  "Tormenta lejana": "Distant thunderstorm",
+  "Campanas de viento": "Wind chimes",
+  "Tanpura": "Tanpura",
+  "Ruido marrón": "Brown noise",
+  "Créditos de sonido": "Sound credits",
+  "Adaptados para reproducción en bucle y volumen equilibrado.": "Adapted for looping playback and balanced volume.",
+  "No se ha podido abrir el enlace.": "Could not open the link."
 }

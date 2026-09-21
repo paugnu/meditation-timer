@@ -4,7 +4,7 @@ Temporizador de meditación para Android, iOS y web, hecho con **Expo SDK 57 + R
 Sin anuncios, sin cuentas, sin backend y sin analítica: todo —preferencias, sesión en curso e historial—
 se guarda solo en el dispositivo. Publicado bajo la marca YogaBond en Google Play y App Store.
 
-Versión actual: `1.2.0`, build 9 (Android `versionCode` 9 / iOS `buildNumber` 9), sin compilar todavía.
+Versión enviada a revisión: `1.3.0`. Contadores y estado de publicación en `app.json` y `store/RELEASE-STATUS.md`.
 Identificador en ambas plataformas: `com.pau.meditationtimer`.
 
 ---
@@ -57,7 +57,7 @@ Identificador en ambas plataformas: `com.pau.meditationtimer`.
 - Temas noche/día y cuatro colores de acento (terracota, azul, verde, rosa), paleta YogaBond con
   titulares en Raleway incluida localmente.
 - Seis idiomas seleccionables y persistidos: español, català/valencià, English, Nederlands, français,
-  русский. 112 claves por idioma, con los mismos tokens de interpolación (hay una prueba que lo verifica).
+  русский. 119 claves por idioma, con los mismos tokens de interpolación (hay una prueba que lo verifica).
   El criterio de la variante valenciana está en [docs/VALENCIAN.md](docs/VALENCIAN.md).
 - Opción de mantener la pantalla encendida durante la sesión.
 - En pantallas bajas (teléfono en horizontal, Split View) el halo pasa a la izquierda y los
@@ -154,7 +154,7 @@ src/components/              ClockFace (halo), SettingsPanel, HistoryPanel, Hist
 src/services/                storage (AsyncStorage), alerts (notificaciones), focus, reviews
 modules/meditation-focus/    Módulo Expo local en Kotlin para No molestar (Android)
 assets/gong.wav              «Meditation Gong» de Marble Toast (CC0); licencia en gong-LICENSE.md
-assets/ambience/             Ambientes sintetizados propios; licencia en ambience/LICENSE.md
+assets/ambience/             Grabaciones seleccionadas y bucles; fuentes en ambience/LICENSE.md
 scripts/                     Generadores de ambientes, gong e iconos, y capturas de tienda
 tests/                       Pruebas de lógica y flujos web (Playwright)
 docs/, store/                Plan, validación, criterio de valencià y material de tienda
@@ -164,9 +164,13 @@ docs/, store/                Plan, validación, criterio de valencià y material
 
 Gong: «Meditation Gong» de Marble Toast, CC0, adaptado a WAV mono; detalles en
 [assets/gong-LICENSE.md](assets/gong-LICENSE.md). Titulares en Raleway (SIL OFL) empaquetada localmente.
-Los sonidos de fondo actuales son **provisionales**: están sintetizados por
-[scripts/generate-ambience.py](scripts/generate-ambience.py), no son grabaciones, y están pensados
-para sustituirse por material CC0 real. Ver [assets/ambience/LICENSE.md](assets/ambience/LICENSE.md).
+Los ocho sonidos de fondo elegidos son lluvia suave, olas del mar, viento, pájaros al amanecer,
+tormenta lejana, campanas de viento, ruido marrón y tanpura. Se incluyen sin conexión, en estéreo,
+con unión cruzada y volumen equilibrado. Seis grabaciones usan la licencia de Pixabay y
+«Rain with distant thunder», de MrAuralization, y «Electronic Tanpuar 4», de sankalp, CC BY 4.0. Créditos accesibles desde Ajustes;
+fuentes, tratamiento y comprobaciones en [assets/ambience/LICENSE.md](assets/ambience/LICENSE.md).
+La continuidad de la reproducción nativa debe verificarse también en iPhone y Android;
+las comprobaciones de archivos no sustituyen esa prueba.
 
 El diseño de la pantalla principal partió de una revisión de la ficha pública y las seis capturas de
 [Meditation Timer de Telesense](https://play.google.com/store/apps/details?id=uk.co.telesense.tm.free&hl=en);

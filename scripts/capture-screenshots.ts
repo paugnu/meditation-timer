@@ -6,17 +6,18 @@
  * store's own pixel size through deviceScaleFactor, so nothing is upscaled after the fact.
  * History is left empty; no meditation records are invented.
  *
- *   npm run web            # in another terminal
- *   npx tsx scripts/capture-screenshots.ts
+ *   npm run build:web
+ *   python3 -m http.server 8082 --directory dist   # in another terminal
+ *   BASE_URL=http://localhost:8082 npx tsx scripts/capture-screenshots.ts
  */
 import { chromium, devices } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 
 const KEY = 'meditation-timer:v1';
 const BASE = process.env.BASE_URL ?? 'http://localhost:8081';
-const SETTINGS = JSON.stringify({ settings: { minutes: 20, theme: 'dark', ambience: 'waves' } });
+const SETTINGS = JSON.stringify({ settings: { minutes: 20, theme: 'dark', ambience: 'rain' } });
 const targets = [
-  { dir: 'store/android-public/screenshots', prefix: 'phone', width: 360, height: 640, scale: 3 },
+  { dir: 'store/android-public/screenshots', prefix: 'phone', width: 360, height: 800, scale: 3 },
   { dir: 'store/ios-public/screenshots', prefix: 'phone', width: 414, height: 896, scale: 3 },
   { dir: 'store/ios-public/screenshots', prefix: 'tablet', width: 1024, height: 1366, scale: 2 },
 ];
@@ -41,6 +42,20 @@ async function capture(browser: Awaited<ReturnType<typeof chromium.launch>>, tar
   await page.getByTestId('countdown').waitFor();
   await page.waitForTimeout(1500);  // Let the fonts land and the halo settle into its orbit.
   await shot('timer');
+  for (const [id, label] of [['waves', 'Olas del mar'], ['wind', 'Viento'], ['birds', 'Pájaros al amanecer']]) {
+    await page.getByTestId('ambience-forward').click();
+    await page.getByTestId('ambience-label').filter({ hasText: label }).waitFor();
+    await shot(`ambience-${id}`);
+  }
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).waitFor();
+  await page.waitForTimeout(1800);
+  await shot('running');
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
+  await page.waitForTimeout(1800);
+  await shot('paused');
+  await page.getByRole('button', { name: 'Finalizar meditación', exact: true }).click();
+  await page.getByRole('button', { name: 'Finalizar sin guardar', exact: true }).click();
   await page.getByRole('button', { name: 'Abrir ajustes' }).click();
   await page.waitForTimeout(700);
   await shot('settings');

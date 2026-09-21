@@ -1,0 +1,194 @@
+[
+  {
+    "file": "store/android-public/screenshots/phone-timer.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "9e89753e4aaa2d060da90f8f9aa8d42672dbc00261010910893d73f2d8ae3d38"
+  },
+  {
+    "file": "store/android-public/screenshots/phone-ambience-waves.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "db76ad3fdcd2446d1071779820db990ceff5cddb4e1a7d3a56b82985ec403ef9"
+  },
+  {
+    "file": "store/android-public/screenshots/phone-ambience-wind.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "f05c6e5af4b6329afe068e0669d384c641eb9f4206b9964b1d40e5792e4bf939"
+  },
+  {
+    "file": "store/android-public/screenshots/phone-ambience-birds.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "023a8d6f2d73398ab07501452367c04223a20be1d8196880b77ed6d415ac1561"
+  },
+  {
+    "file": "store/android-public/screenshots/phone-running.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "a8e42eeaeae5c1733ce66fe6a51665014283a8428a422c151ae5d591d32c6e4f"
+  },
+  {
+    "file": "store/android-public/screenshots/phone-paused.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "be912279ae2da36c74e9ca165b3ee52736c45640f37355274b052c18b032fda2"
+  },
+  {
+    "file": "store/android-public/screenshots/phone-settings.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "a4d38694ba92125fdd64d3f3b93a7529eb91d06559b5df4d341a2abe29c83f3e"
+  },
+  {
+    "file": "store/android-public/screenshots/phone-calendar.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "sha256": "1a67cd7bb7d441c5ec2a53587f7ccda165e71a4d2202a6b5b3ba6a1cd153ce1d"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-timer.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "053d11a848ab98ad00515aaeb1abfa34e742edcb8260b6176bcd3115a4816f9f"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-ambience-waves.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "c1f33742febd41111a6678810743122dcddca0d61f1f1625342295279be0604e"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-ambience-wind.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "ec553a317e20385e3ab22261e38050d42c36a951cfc3c636ff7062e153eee38a"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-ambience-birds.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "3fd68da25122c0c07a2aece1fd2a004bce15850f75d54a88ad6a1d15058e852c"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-running.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "78694b5431c58c4142748e9246bd53a1a42ba367690e3b4cb508215b13ac61a7"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-paused.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "f3c01f54ab51539e56c693a8034539d9475bc3147012fb53f8db67447875247c"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-settings.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "9e0ae15874fe164bd4b583a94d04685fa0a5358cbba6fb0fe096e0507b23c47d"
+  },
+  {
+    "file": "store/ios-public/screenshots/phone-calendar.png",
+    "size": [
+      1242,
+      2688
+    ],
+    "sha256": "0671a32d494158f2cbc93663589580f349b12dac07b4d6d869e64b6459d91869"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-timer.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "63f87acfcdc0b1395546086c2f891dddf4c8d63fd7529cbe56149674e75f6203"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-ambience-waves.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "614d7c755bc36f0fc11d7f9b53a6898b32bca74c81bc826d727492401e441e9e"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-ambience-wind.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "a1d517268381f83501c1e3579760232ca1e615d6aaf931b4e7f3dfe0d99247bb"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-ambience-birds.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "ded6394e94eaee5a26e955390799334df2b7ca068468629b54a3a08330a495e0"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-running.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "c967e9652c491fc37ee73677bde833dc13b6f8e3a9763423f910396995821c4a"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-paused.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "39fec0ec67c7d37be4d3f5921b90f9bf230eb684df8c0e02cf5c48b3e97c62ee"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-settings.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "6c996db212ccf9e0f5d78acacdd81b9838d3f52f783277a879f30b88db58a16d"
+  },
+  {
+    "file": "store/ios-public/screenshots/tablet-calendar.png",
+    "size": [
+      2048,
+      2732
+    ],
+    "sha256": "2e2a02a0baadf88596beee6f60e905416ba70c8473fe81becbb9cb48cc9c09c6"
+  }
+]

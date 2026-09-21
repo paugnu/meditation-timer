@@ -1,11 +1,11 @@
 # Capturas para App Store Connect
 
-Generadas el 8 de septiembre de 2026 con `npx tsx scripts/capture-screenshots.ts` sobre la app real
-servida en http://localhost:8081, usando Chrome con Playwright.
+Generadas el 8 de septiembre de 2026 con `BASE_URL=http://127.0.0.1:8082 npx tsx scripts/capture-screenshots.ts` sobre la exportación web de producción (`npm run build:web`), usando Chrome con Playwright. Sin indicadores del servidor de desarrollo.
 
 - `phone-*.png`: 1242 × 2688, viewport 414 × 896 con `deviceScaleFactor` 3.
 - `tablet-*.png`: 2048 × 2732, viewport 1024 × 1366 con `deviceScaleFactor` 2.
-- Tres vistas por formato: timer, settings, calendar. Español, tema noche, registro vacío.
+- Ocho vistas por formato: timer (lluvia), ambience-waves, ambience-wind, ambience-birds, running, paused, settings y calendar. Español, tema noche, registro vacío.
+- Juego actualizado tras incorporar las cuatro grabaciones CC0 reales. Las capturas de ejecución y pausa proceden de una sesión real breve en un contexto de navegador aislado. No se guardó ningún registro ficticio.
 - Renderizadas directamente a la resolución exigida por la ficha: **no hay reescalado**, a
   diferencia de las capturas anteriores. Sin recortes, sin retoque, sin interfaz de iOS añadida.
 
