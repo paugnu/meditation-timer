@@ -60,7 +60,7 @@ the tested ones), all effects and orchestration in `src/hooks/useMeditation.ts`,
   duration) so it swells out of the decay, and completion drops the ambience as the closing gong
   rings. That hold is computed during render — set from an effect it is still stale on the commit
   that starts the session, and the ambience slips in ahead of the gong.
-- **Locales stay in lockstep.** Six dictionaries, 119 keys each, identical interpolation tokens; a test
+- **Locales stay in lockstep.** Six dictionaries, 138 keys each, identical interpolation tokens; a test
   enforces it. Spanish source strings are the keys, so changing Spanish copy means updating all six files.
   Catalan is the Valencian variant — follow [docs/VALENCIAN.md](docs/VALENCIAN.md).
 - **A running session offers one control.** `Finalizar` appears only when paused or completed, so
@@ -82,8 +82,8 @@ the tested ones), all effects and orchestration in `src/hooks/useMeditation.ts`,
   Fetch and integrate `origin/main` before starting, preserving any uncommitted work. Finish authorized
   changes with verification, commit and push to `origin/main`; confirm the working tree is clean and
   local and remote commits match. Do not leave completed changes only on this machine.
-- Verify with `npm run typecheck && npm test` (27 unit tests, node:test via tsx) and, for UI changes,
-  `npm run test:e2e` (35 Playwright scenarios against the web build; needs Chrome). Occasional startup
+- Verify with `npm run typecheck && npm test` (32 unit tests, node:test via tsx) and, for UI changes,
+  `npm run test:e2e` (42 Playwright scenarios against the web build; needs Chrome). Occasional startup
   flake under full parallelism passes on a serial rerun.
 - Style is deliberately dense: compact modules, inline JSX styling, comments only where an invariant is
   non-obvious. Match it rather than reformatting.

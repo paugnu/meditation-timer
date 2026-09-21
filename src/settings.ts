@@ -5,8 +5,8 @@ export const COLORS = [
   { name: 'Terracota', value: '#85471E' }, { name: 'Azul', value: '#6579FF' },
   { name: 'Verde', value: '#4FBA9A' }, { name: 'Rosa', value: '#DF7A9D' },
 ] as const;
-export type Settings = { language: Language; ambience: AmbienceId; minutes: number; theme: 'dark' | 'light'; color: string; gong: boolean; gongStart: boolean; volume: number; keepAwake: boolean; dnd: boolean };
-export const defaults: Settings = { language: 'es', ambience: 'none', minutes: 20, theme: 'dark', color: COLORS[0].value, gong: true, gongStart: false, volume: 0.7, keepAwake: true, dnd: false };
+export type Settings = { language: Language; ambience: AmbienceId; minutes: number; theme: 'dark' | 'light'; color: string; gong: boolean; gongStart: boolean; volume: number; keepAwake: boolean; dimScreen: boolean; dnd: boolean };
+export const defaults: Settings = { language: 'es', ambience: 'none', minutes: 20, theme: 'dark', color: COLORS[0].value, gong: true, gongStart: false, volume: 0.7, keepAwake: true, dimScreen: false, dnd: false };
 export function restoreSettings(value: unknown): Settings {
   const s = (value && typeof value === 'object' ? value : {}) as Partial<Settings>;
   return {
@@ -19,6 +19,7 @@ export function restoreSettings(value: unknown): Settings {
     gong: typeof s.gong === 'boolean' ? s.gong : defaults.gong,
     volume: typeof s.volume === 'number' && Number.isFinite(s.volume) ? Math.max(0, Math.min(1, s.volume)) : defaults.volume,
     keepAwake: typeof s.keepAwake === 'boolean' ? s.keepAwake : defaults.keepAwake,
+    dimScreen: typeof s.dimScreen === 'boolean' ? s.dimScreen : defaults.dimScreen,
     dnd: typeof s.dnd === 'boolean' ? s.dnd : defaults.dnd,
   };
 }

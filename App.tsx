@@ -1,14 +1,17 @@
 import { maybeRequestReview } from './src/services/reviews';
 import { ambienceLabels, stepAmbience } from './src/ambience';
+import { useDimming } from './src/hooks/useDimming';
 import { useAmbience } from './src/hooks/useAmbience';
 import { translator } from './src/i18n';
 import { useFonts } from 'expo-font';
 import { Raleway_400Regular } from '@expo-google-fonts/raleway/400Regular';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, Modal, PanResponder, Text, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as NavigationBar from 'expo-navigation-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Startup } from './src/components/Startup';
+import { DurationPicker } from './src/components/DurationPicker';
 import { ClockFace } from './src/components/ClockFace';
 import { Icon } from './src/components/Icon';
 import { SettingsPanel } from './src/components/SettingsPanel';
@@ -16,13 +19,17 @@ import { useMeditation } from './src/hooks/useMeditation';
 import { formatTime } from './src/timer';
 import { appTheme, headingFont } from './src/theme';
 
-function MeditationScreen() {
+function MeditationScreen({ fontsReady }: { fontsReady: boolean }) {
+  const [starting, setStarting] = useState(true);
+  const finishStartup = useCallback(() => setStarting(false), []);
   const meditation = useMeditation();
   const { settings, timer, remainingMs, busy, ready } = meditation;
   const t = translator(settings.language);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDuration, setShowDuration] = useState(false);
   const { width, height } = useWindowDimensions();
   const active = timer.status === 'running';
+  const dimming = useDimming(settings.dimScreen && !starting, active, timer.endsAt, meditation.notify);
   const chromeOpacity = useRef(new Animated.Value(active ? 0 : 1)).current;
   useEffect(() => {
     const fade = Animated.timing(chromeOpacity, {
@@ -40,12 +47,12 @@ function MeditationScreen() {
   const muted = palette.muted;
   const completedCount = meditation.history.filter(record => record.completed).length;
   useEffect(() => {
-    if (!ready || busy || active || paused || showSettings || meditation.confirmFinish) return;
+    if (!ready || starting || busy || active || paused || showDuration || showSettings || meditation.confirmFinish) return;
     let cancelled = false;
     // Allow the final gong and a quiet moment before asking; never interrupt a session.
     const timeout = setTimeout(() => { void maybeRequestReview(completedCount, () => !cancelled); }, completed ? 18000 : 2000);
     return () => { cancelled = true; clearTimeout(timeout); };
-  }, [ready, busy, active, paused, completed, showSettings, meditation.confirmFinish, completedCount]);
+  }, [ready, starting, busy, active, paused, completed, showDuration, showSettings, meditation.confirmFinish, completedCount]);
   const cycleAmbience = (step: number) => meditation.updateSettings({ ambience: stepAmbience(settings.ambience, step) });
   const cycle = useRef(cycleAmbience);
   cycle.current = cycleAmbience;
@@ -61,20 +68,20 @@ function MeditationScreen() {
   useEffect(() => {
     if (Platform.OS === 'android') void NavigationBar.setVisibilityAsync('visible').catch(() => {});
   }, []);
-  return <SafeAreaView style={[styles.screen, { backgroundColor: bg }]}>
+  return <SafeAreaView onTouchStart={dimming.touch} style={[styles.screen, { backgroundColor: bg }]}>
     <StatusBar style={dark ? 'light' : 'dark'} hidden={false}/>
-    {!ready ? <View style={styles.loading}><ActivityIndicator color={palette.accent}/></View> : <ScrollView contentContainerStyle={styles.scroll} bounces={false}>
+    {!ready || !fontsReady ? <View style={styles.loading}/> : <ScrollView aria-hidden={starting || dimming.dimmed} accessibilityElementsHidden={starting || dimming.dimmed} importantForAccessibility={starting || dimming.dimmed ? 'no-hide-descendants' : 'auto'} contentContainerStyle={styles.scroll} bounces={false}>
       <View style={[styles.layout, wide && styles.layoutWide]}>
       <View style={[styles.clockArea, wide && styles.clockAreaWide]}><ClockFace key={meditation.sessionSequence} running={active} size={size} progress={1 - remainingMs / timer.durationMs} color={palette.accent}/></View>
       <View style={wide ? styles.panelWide : styles.panel}>
       <View style={styles.readout}>
-        <Pressable accessibilityRole="button" accessibilityLabel={active || paused ? t('Tiempo restante {time}', { time: formatTime(remainingMs) }) : t('Cambiar duración, {n} minutos', { n: settings.minutes })} disabled={active || paused || busy || !ready} onPress={() => setShowSettings(true)}>
+        <Pressable accessibilityRole="button" accessibilityLabel={active || paused ? t('Tiempo restante {time}', { time: formatTime(remainingMs) }) : t('Cambiar duración, {n} minutos', { n: settings.minutes })} disabled={starting || active || paused || busy || !ready} onPress={() => setShowDuration(true)}>
           <Text testID="countdown" maxFontSizeMultiplier={1.3} style={[styles.time, { color: palette.accent, fontSize: Math.min(width * (wide ? .1 : .205), 100) }]}>{formatTime(remainingMs)}</Text>
         </Pressable>
         <Text accessibilityLiveRegion="polite" maxFontSizeMultiplier={1.5} style={[styles.stateLabel, { color: muted }]}>{paused ? t("EN PAUSA") : completed ? t("SESIÓN COMPLETADA") : '\u00A0'}</Text>
       </View>
       <View style={[styles.controls, wide && styles.controlsWide]}>
-        <Pressable accessibilityRole="button" accessibilityLabel={active ? t("Pausar meditación") : paused ? t("Continuar meditación") : completed ? t("Meditar de nuevo") : t("Iniciar meditación")} disabled={busy} onPress={() => { void (active ? meditation.pause() : meditation.start()); }} style={({ pressed }) => [styles.primaryButton, { backgroundColor: palette.button, opacity: pressed || busy ? .6 : 1 }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={active ? t("Pausar meditación") : paused ? t("Continuar meditación") : completed ? t("Meditar de nuevo") : t("Iniciar meditación")} disabled={starting || busy} onPress={() => { void (active ? meditation.pause() : meditation.start()); }} style={({ pressed }) => [styles.primaryButton, { backgroundColor: palette.button, opacity: pressed || busy ? .6 : 1 }]}>
           {busy ? <ActivityIndicator color={palette.onButton}/> : <Icon name={active ? 'pause' : 'play'} color={palette.onButton} size={24}/>}
         </Pressable>
         <View style={styles.finishSlot}>{(paused || completed) && <Pressable accessibilityRole="button" accessibilityLabel={t("Finalizar meditación")} disabled={busy} onPress={() => { void meditation.requestFinish(); }} style={styles.finishButton}><Text maxFontSizeMultiplier={1.5} style={{ color: muted, fontSize: 14 }}>{t("Finalizar")}</Text></Pressable>}</View>
@@ -85,7 +92,7 @@ function MeditationScreen() {
           <Pressable accessibilityElementsHidden importantForAccessibility="no" onPress={() => cycleAmbience(1)} hitSlop={6} testID="ambience-forward" style={({ pressed }) => [styles.chevron, { opacity: pressed ? 1 : .45 }]}><Icon name="forward" color={muted} size={15}/></Pressable>
         </View>
         <Animated.View style={{ opacity: chromeOpacity }}>
-          <Pressable accessibilityRole="button" accessibilityLabel={t("Abrir ajustes")} accessibilityState={{ disabled: active || busy || !ready }} disabled={active || busy || !ready} onPress={() => setShowSettings(true)} style={({ pressed }) => [styles.gear, wide && styles.gearWide, { opacity: pressed ? .5 : 1 }]}><Icon name="settings" color={muted} size={21}/></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel={t("Abrir ajustes")} accessibilityState={{ disabled: active || busy || !ready }} disabled={starting || active || busy || !ready} onPress={() => setShowSettings(true)} style={({ pressed }) => [styles.gear, wide && styles.gearWide, { opacity: pressed ? .5 : 1 }]}><Icon name="settings" color={muted} size={21}/></Pressable>
         </Animated.View>
       </View>
       </View>
@@ -103,13 +110,15 @@ function MeditationScreen() {
         </View>
       </View>
     </Modal>
+    {showDuration && <DurationPicker settings={settings} close={() => setShowDuration(false)} save={minutes => { meditation.updateSettings({ minutes }); setShowDuration(false); }}/>}
     <SettingsPanel visible={showSettings} settings={settings} history={meditation.history} deleteRecord={meditation.deleteRecord} inProgress={paused} update={meditation.updateSettings} close={() => setShowSettings(false)} testSound={meditation.playGong}/>
+    {dimming.dimmed && <Pressable testID="dim-screen" accessibilityRole="button" accessibilityLabel={t('Recuperar brillo')} onPress={dimming.wake} style={[StyleSheet.absoluteFill, { backgroundColor: Platform.OS === 'web' ? '#000000DD' : 'transparent', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 60 }]}><Text maxFontSizeMultiplier={1.4} style={{ color: '#B0A598', fontSize: 12 }}>{t('Toca para recuperar el brillo')}</Text></Pressable>}
+    {starting && <Startup ready={ready && fontsReady} finish={finishStartup}/>}
   </SafeAreaView>;
 }
 export default function App() {
   const [loaded, error] = useFonts({ Raleway_400Regular });
-  if (!loaded && !error) return <View style={{ flex: 1, backgroundColor: '#181613', alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color="#D7A17C"/></View>;
-  return <SafeAreaProvider><MeditationScreen/></SafeAreaProvider>;
+  return <SafeAreaProvider><MeditationScreen fontsReady={loaded || !!error}/></SafeAreaProvider>;
 }
 const styles = StyleSheet.create({
   confirmOverlay: { flex: 1, backgroundColor: '#00000088', justifyContent: 'center', alignItems: 'center', padding: 24 },

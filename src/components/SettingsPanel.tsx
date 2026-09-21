@@ -121,6 +121,7 @@ export function SettingsPanel({ visible, settings, history, deleteRecord, inProg
           <View style={styles.colors}>{COLORS.map(color => <Pressable key={color.name} accessibilityRole="button" accessibilityLabel={t('Color {name}', { name: t(color.name) })} accessibilityState={{ selected: settings.color === color.value }} onPress={() => update({ color: color.value })} style={[styles.swatch, { borderColor: settings.color === color.value ? color.value : 'transparent' }]}><View style={[styles.swatchInner, { backgroundColor: color.value }]}>{settings.color === color.value && <Icon name="check" color="#080808" size={20}/>}</View></Pressable>)}</View>
           {toggle(t("Mantener pantalla encendida"), settings.keepAwake, keepAwake => update({ keepAwake }), t("Solo mientras el temporizador está en marcha."))}
 
+          {toggle(t("Atenuar pantalla"), settings.dimScreen, dimScreen => update({ dimScreen }), t("Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo."))}
           {heading(t("SIN INTERRUPCIONES"))}
           {Platform.OS === 'android' && focus.available ? <>
             {toggle(t("Activar No molestar"), settings.dnd, dnd => update({ dnd }), t("Durante la sesión. Se restaura al pausar o terminar. Las alarmas siguen permitidas."))}

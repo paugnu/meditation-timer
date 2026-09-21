@@ -4,7 +4,8 @@ Temporizador de meditación para Android, iOS y web, hecho con **Expo SDK 57 + R
 Sin anuncios, sin cuentas, sin backend y sin analítica: todo —preferencias, sesión en curso e historial—
 se guarda solo en el dispositivo. Publicado bajo la marca YogaBond en Google Play y App Store.
 
-Versión enviada a revisión: `1.3.0`. Contadores y estado de publicación en `app.json` y `store/RELEASE-STATUS.md`.
+Versión preparada: `1.5.0`, build 14 (Android `versionCode` 14 / iOS `buildNumber` 14).
+El estado de compilación y envío se registra en `store/RELEASE-STATUS.md`.
 Identificador en ambas plataformas: `com.pau.meditationtimer`.
 
 ---
@@ -13,6 +14,8 @@ Identificador en ambas plataformas: `com.pau.meditationtimer`.
 
 **Sesión**
 - Duración de 1 a 180 minutos, con accesos rápidos (5, 10, 15, 30, 45, 60). Por defecto 20.
+  Tocar el tiempo abre un modal: los accesos rápidos guardan y cierran; la rueda permite elegir
+  cualquier minuto y guardar, o cancelar sin cambios.
 - Iniciar, pausar, continuar y finalizar. Mientras la sesión corre la pantalla ofrece solo pausar:
   para terminar antes de tiempo se pausa primero. Al finalizar antes de tiempo pregunta si quieres
   guardar la meditación; el reloj se congela antes de preguntar, así que decidir no cuenta como
@@ -51,15 +54,21 @@ Identificador en ambas plataformas: `com.pau.meditationtimer`.
   Las pausas no suman tiempo. Borrado individual de registros con confirmación.
 
 **Interfaz**
+- Arranque con el mismo halo de la sesión: imagen nativa estática, giro durante la carga y
+  fundido al estar listos la fuente y los datos. Respeta «Reducir movimiento».
 - Pantalla principal sin título ni cabecera: arriba el halo y la cuenta atrás, después el botón
   de inicio, y por debajo la zona de controles con el selector de sonido de fondo y una rueda de
   ajustes discreta.
 - Temas noche/día y cuatro colores de acento (terracota, azul, verde, rosa), paleta YogaBond con
   titulares en Raleway incluida localmente.
 - Seis idiomas seleccionables y persistidos: español, català/valencià, English, Nederlands, français,
-  русский. 119 claves por idioma, con los mismos tokens de interpolación (hay una prueba que lo verifica).
+  русский. 138 claves por idioma, con los mismos tokens de interpolación (hay una prueba que lo verifica).
   El criterio de la variante valenciana está en [docs/VALENCIAN.md](docs/VALENCIAN.md).
 - Opción de mantener la pantalla encendida durante la sesión.
+- Atenuación opcional durante la meditación tras 10 segundos sin tocar la pantalla. Un toque
+  recupera el brillo sin accionar los controles y reinicia la espera. Pausar, completar o salir
+  de la app restaura el brillo. Android recupera el modo de brillo del sistema; iOS respeta
+  cambios manuales posteriores. En web se simula con una capa oscura.
 - En pantallas bajas (teléfono en horizontal, Split View) el halo pasa a la izquierda y los
   controles a la derecha, para que el botón de inicio nunca quede fuera de la pantalla.
 - El permiso de avisos se puede conceder desde Ajustes, sin esperar a que lo pida el botón de
@@ -90,8 +99,8 @@ npm run ios       # requiere macOS + Xcode
 
 ```bash
 npm run typecheck
-npm test          # 27 pruebas de lógica (node:test vía tsx)
-npm run test:e2e  # 32 escenarios Playwright sobre la vista web; necesita Google Chrome
+npm test          # 32 pruebas de lógica (node:test vía tsx)
+npm run test:e2e  # 39 escenarios Playwright sobre la vista web; necesita Google Chrome
 npx expo-doctor
 npx expo export --platform all
 npx expo prebuild --no-install
@@ -149,6 +158,8 @@ src/i18n.ts + src/locales/   Seis diccionarios e interpolación
 src/theme.ts                 Paleta YogaBond y fuente de titulares
 src/reviewPolicy.ts          Política pura de valoración (un intento por instalación)
 src/hooks/useMeditation.ts   Sesión, persistencia, audio, permisos y ciclo de vida
+src/hooks/useDimming.ts      Atenuación, toque para recuperar brillo y ciclo de vida
+src/brightness.ts            Escrituras de brillo serializadas y restauración
 src/hooks/useAmbience.ts     Motor de fundido cruzado del sonido de fondo
 src/components/              ClockFace (halo), SettingsPanel, HistoryPanel, HistoryCalendar, Icon
 src/services/                storage (AsyncStorage), alerts (notificaciones), focus, reviews

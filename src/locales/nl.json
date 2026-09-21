@@ -128,5 +128,13 @@
   "Ruido marrón": "Bruine ruis",
   "Créditos de sonido": "Geluidscredits",
   "Adaptados para reproducción en bucle y volumen equilibrado.": "Bewerkt voor herhaalde weergave en een gelijkmatig volume.",
-  "No se ha podido abrir el enlace.": "De link kon niet worden geopend."
+  "No se ha podido abrir el enlace.": "De link kon niet worden geopend.",
+  "Guardar duración": "Duur opslaan",
+  "Reducir duración": "Duur verkorten",
+  "Aumentar duración": "Duur verlengen",
+  "Atenuar pantalla": "Scherm dimmen",
+  "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.": "Dimt het scherm na 10 seconden zonder aanraking tijdens de meditatie. Tik om de helderheid te herstellen.",
+  "Recuperar brillo": "Helderheid herstellen",
+  "Toca para recuperar el brillo": "Tik om de helderheid te herstellen",
+  "No se ha podido ajustar el brillo de la pantalla.": "De schermhelderheid kon niet worden aangepast."
 }

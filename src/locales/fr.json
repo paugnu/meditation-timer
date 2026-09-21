@@ -128,5 +128,13 @@
   "Ruido marrón": "Bruit brun",
   "Créditos de sonido": "Crédits sonores",
   "Adaptados para reproducción en bucle y volumen equilibrado.": "Adaptés pour la lecture en boucle et un volume équilibré.",
-  "No se ha podido abrir el enlace.": "Impossible d’ouvrir le lien."
+  "No se ha podido abrir el enlace.": "Impossible d’ouvrir le lien.",
+  "Guardar duración": "Enregistrer la durée",
+  "Reducir duración": "Réduire la durée",
+  "Aumentar duración": "Augmenter la durée",
+  "Atenuar pantalla": "Atténuer l’écran",
+  "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.": "Réduit la luminosité après 10 secondes sans toucher l’écran pendant la méditation. Touchez pour la rétablir.",
+  "Recuperar brillo": "Rétablir la luminosité",
+  "Toca para recuperar el brillo": "Touchez pour rétablir la luminosité",
+  "No se ha podido ajustar el brillo de la pantalla.": "Impossible de régler la luminosité de l’écran."
 }

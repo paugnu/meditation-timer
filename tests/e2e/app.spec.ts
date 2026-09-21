@@ -634,3 +634,110 @@ test('with both gongs disabled the ambience fades in and fades out on completion
   const gongs = await page.evaluate(() => (window as unknown as { sources: string[] }).sources.filter(s => !s.includes('tanpura')));
   expect(gongs).toEqual([]);
 });
+
+test('countdown opens duration picker, presets save immediately and persist', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('countdown').click();
+  await expect(page.getByRole('heading', { name: 'Duración', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ajustes', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '45 minutos', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Duración', exact: true })).toHaveCount(0);
+  await expect(page.getByTestId('countdown')).toHaveText('45:00');
+  await page.reload();
+  await expect(page.getByTestId('countdown')).toHaveText('45:00');
+});
+
+test('duration wheel edits a draft, supports cancellation, saving and limits', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('countdown').click();
+  const wheel = page.getByTestId('duration-wheel');
+  await expect.poll(() => wheel.evaluate(el => el.scrollTop)).toBe(19 * 48);
+  await wheel.evaluate(el => { el.scrollTop = 36 * 48; });
+  await expect(page.getByText('37 minutos', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Cancelar', exact: true }).last().click();
+  await expect(page.getByTestId('countdown')).toHaveText('20:00');
+  await page.getByTestId('countdown').click();
+  await expect.poll(() => wheel.evaluate(el => el.scrollTop)).toBe(19 * 48);
+  await wheel.evaluate(el => { el.scrollTop = 36 * 48; });
+  await expect(page.getByText('37 minutos', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Guardar duración' }).click();
+  await expect(page.getByTestId('countdown')).toHaveText('37:00');
+  await page.reload();
+  await expect(page.getByTestId('countdown')).toHaveText('37:00');
+  await page.getByTestId('countdown').click();
+  await wheel.evaluate(el => { el.scrollTop = 0; });
+  await expect(page.getByRole('button', { name: 'Reducir duración' })).toBeDisabled();
+  await wheel.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await expect(page.getByRole('button', { name: 'Aumentar duración' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Guardar duración' }).click();
+  await expect(page.getByTestId('countdown')).toHaveText('180:00');
+});
+
+test('duration cannot change during a running or paused session', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await expect(page.getByRole('button', { name: /Tiempo restante/ })).toBeDisabled();
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
+  await expect(page.getByRole('button', { name: /Tiempo restante/ })).toBeDisabled();
+});
+
+for (const reduced of [false, true]) test(`startup shows the app halo until fonts settle, reduced motion=${reduced}`, async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: reduced ? 'reduce' : 'no-preference' });
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  await page.route(/\.(ttf|woff2?)(\?|$)/, async route => {
+    await gate;
+    if (reduced) await route.abort(); else await route.continue();
+  });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByTestId('startup-halo')).toBeVisible();
+  await expect(page.getByTestId('startup-orbit')).toBeVisible();
+  await expect(page.getByTestId('countdown')).toHaveCount(0);
+  release();
+  await expect(page.getByTestId('startup-halo')).toHaveCount(0);
+  await expect(page.getByTestId('countdown')).toHaveText('20:00');
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Pausar meditación', exact: true })).toBeVisible();
+});
+
+test('optional dimming persists, wakes without pausing, rearms and clears on pause', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('switch', { name: 'Atenuar pantalla', exact: true }).click();
+  await page.getByRole('button', { name: 'Cerrar ajustes' }).click();
+  await page.reload();
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await page.clock.fastForward(11000);
+  await expect(page.getByTestId('dim-screen')).toBeVisible();
+  await page.getByRole('button', { name: 'Recuperar brillo', exact: true }).click();
+  await expect(page.getByTestId('dim-screen')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Pausar meditación', exact: true })).toBeVisible();
+  await page.clock.fastForward(11000);
+  await expect(page.getByTestId('dim-screen')).toBeVisible();
+  await page.getByRole('button', { name: 'Recuperar brillo', exact: true }).click();
+  await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
+  await page.clock.fastForward(11000);
+  await expect(page.getByTestId('dim-screen')).toHaveCount(0);
+  await expect(page.getByText('EN PAUSA', { exact: true })).toBeVisible();
+});
+
+test('completion restores visibility and dimming stays off by default', async ({ page }) => {
+  await page.clock.install();
+  await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({
+    settings: { minutes: 1, dimScreen: true, gong: false },
+  })), key);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await page.clock.fastForward(11000);
+  await expect(page.getByTestId('dim-screen')).toBeVisible();
+  await page.clock.fastForward(60000);
+  await expect(page.getByTestId('dim-screen')).toHaveCount(0);
+  await expect(page.getByText('SESIÓN COMPLETADA', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('switch', { name: 'Atenuar pantalla', exact: true }).click();
+  await page.getByRole('button', { name: 'Cerrar ajustes' }).click();
+  await page.getByRole('button', { name: 'Iniciar meditación', exact: true }).click();
+  await page.clock.fastForward(11000);
+  await expect(page.getByTestId('dim-screen')).toHaveCount(0);
+});

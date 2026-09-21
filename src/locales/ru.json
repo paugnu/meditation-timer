@@ -128,5 +128,13 @@
   "Ruido marrón": "Коричневый шум",
   "Créditos de sonido": "Авторы звуков",
   "Adaptados para reproducción en bucle y volumen equilibrado.": "Адаптированы для циклического воспроизведения и сбалансированной громкости.",
-  "No se ha podido abrir el enlace.": "Не удалось открыть ссылку."
+  "No se ha podido abrir el enlace.": "Не удалось открыть ссылку.",
+  "Guardar duración": "Сохранить длительность",
+  "Reducir duración": "Уменьшить длительность",
+  "Aumentar duración": "Увеличить длительность",
+  "Atenuar pantalla": "Затемнять экран",
+  "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.": "Уменьшает яркость через 10 секунд без касаний во время медитации. Коснитесь экрана, чтобы восстановить яркость.",
+  "Recuperar brillo": "Восстановить яркость",
+  "Toca para recuperar el brillo": "Коснитесь, чтобы восстановить яркость",
+  "No se ha podido ajustar el brillo de la pantalla.": "Не удалось изменить яркость экрана."
 }

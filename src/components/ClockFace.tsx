@@ -10,7 +10,7 @@ function arc(radius: number, start: number, end: number) {
   return `M ${a[0]} ${a[1]} A ${radius} ${radius} 0 ${end - start > 180 ? 1 : 0} 1 ${b[0]} ${b[1]}`;
 }
 
-export function ClockFace({ size, progress, color, running }: { size: number; progress: number; color: string; running: boolean }) {
+export function ClockFace({ size, progress, color, running, id = 'halo' }: { id?: string; size: number; progress: number; color: string; running: boolean }) {
   const rotation = useRef(new Animated.Value(0)).current;
   const [reduceMotion, setReduceMotion] = useState(true);
   const [foreground, setForeground] = useState(AppState.currentState === 'active');
@@ -38,22 +38,22 @@ export function ClockFace({ size, progress, color, running }: { size: number; pr
     return () => { cancelled = true; rotation.stopAnimation(); };
   }, [running, reduceMotion, foreground, rotation]);
 
-  return <View testID="meditation-halo" accessible={false} pointerEvents="none" style={{ width: size, height: size }}>
+  return <View testID={`meditation-${id}`} accessible={false} pointerEvents="none" style={{ width: size, height: size }}>
     <Svg width={size} height={size} viewBox="0 0 320 320" accessible={false}>
-      <Defs><RadialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <Defs><RadialGradient id={`${id}-glow`} cx="50%" cy="50%" r="50%">
         <Stop offset="62%" stopColor={color} stopOpacity="0"/>
         <Stop offset="80%" stopColor={color} stopOpacity="0.065"/>
         <Stop offset="88%" stopColor={color} stopOpacity="0.025"/>
         <Stop offset="100%" stopColor={color} stopOpacity="0"/>
       </RadialGradient></Defs>
-      <Circle cx="160" cy="160" r="157" fill="url(#halo)"/>
+      <Circle cx="160" cy="160" r="157" fill={`url(#${id}-glow)`}/>
       <Circle cx="160" cy="160" r={RADIUS} fill="none" stroke={color} strokeWidth="1" opacity="0.16"/>
       {fraction > 0 && <G transform="rotate(-90 160 160)">
         <Circle cx="160" cy="160" r={RADIUS} fill="none" stroke={color} strokeWidth="7" opacity="0.06" strokeDasharray={[CIRCUMFERENCE * fraction, CIRCUMFERENCE]} strokeLinecap="round"/>
-        <Circle testID="halo-progress" cx="160" cy="160" r={RADIUS} fill="none" stroke={color} strokeWidth="2" opacity="0.85" strokeDasharray={[CIRCUMFERENCE * fraction, CIRCUMFERENCE]} strokeLinecap="round"/>
+        <Circle testID={`${id}-progress`} cx="160" cy="160" r={RADIUS} fill="none" stroke={color} strokeWidth="2" opacity="0.85" strokeDasharray={[CIRCUMFERENCE * fraction, CIRCUMFERENCE]} strokeLinecap="round"/>
       </G>}
     </Svg>
-    <Animated.View testID="halo-orbit" style={[StyleSheet.absoluteFill, { transform: [{ rotate: rotation.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }]}>
+    <Animated.View testID={`${id}-orbit`} style={[StyleSheet.absoluteFill, { transform: [{ rotate: rotation.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }]}>
       <Svg width={size} height={size} viewBox="0 0 320 320" accessible={false}>
         {Array.from({ length: 32 }, (_, index) => {
           const opacity = .015 + Math.pow(index / 31, 2) * .4;
@@ -64,7 +64,7 @@ export function ClockFace({ size, progress, color, running }: { size: number; pr
           </G>;
         })}
         <Path d={arc(113, 35, 130)} fill="none" stroke={color} strokeWidth=".7" opacity=".12" strokeLinecap="round"/>
-        <Circle testID="halo-tip" cx="160" cy="24" r="2" fill={color} opacity=".65"/>
+        <Circle testID={`${id}-tip`} cx="160" cy="24" r="2" fill={color} opacity=".65"/>
       </Svg>
     </Animated.View>
   </View>;

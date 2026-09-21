@@ -300,3 +300,31 @@ Pendiente y no hecho aquí:
 - Android: promovida build 12 desde pruebas internas al borrador de producción 1.4.0 (12) · Tanpura, versión de canal 5. Validación sin incidencias, sin pérdida de dispositivos; lanzamiento al 100 % en todos los países de destino actuales. Guardado, pendiente de enviar a revisión.
 - **Android enviado a revisión:** descripción actualizada a ocho sonidos, incluida Tanpura. Confirmados «Enviar 2 cambios a revisión» y «Enviar cambios a revisión». Google Play muestra **Cambios en revisión** para producción 1.4.0 (12) y la ficha es-ES. Comprobaciones rápidas en curso (hasta 14 minutos); publicación gestionada desactivada, lanzamiento completo tras aprobación. No equivale a aprobación ni disponibilidad pública.
 - Envíos públicos completados en ambas tiendas. App Store 1.4.0 (13): WAITING_FOR_REVIEW y AFTER_APPROVAL, enviado 2026-09-13T04:58:32Z. Google Play 1.4.0 (12): Cambios en revisión. La aprobación depende de cada tienda.
+
+## 2026-09-21 · Preparación de 1.5.0 (14)
+
+- Pau autoriza commit, push y envío a ambas tiendas.
+- EAS confirma versiones posteriores al último registro local: Android 1.4.0 (12), build `7580ac22-32fe-4a12-b939-5e786225db8c`, e iOS 1.4.0 (13), build `19558300-67bd-4620-9573-61ec1c9339ac`, ambas FINISHED. Esto confirma compilación, no su estado de publicación.
+- Nueva entrega 1.5.0 (14) en ambas plataformas: halo de arranque y transición, modal de duración con valores rápidos y rueda, atenuación opcional y recuperación al tocar. No molestar ya existente en Android se conserva.
+- Verificados tipos, 32 pruebas unitarias, 39 escenarios Playwright y exportación de bundles Android/iOS. Brillo físico y arranque nativo pendientes de prueba en dispositivos.
+- Perfil `release` conserva los números explícitos del commit; envío `production` preparado para las tiendas, sin modificar el canal de pruebas.
+- Compilación y envío todavía pendientes. Google Play accesible; App Store Connect solicita iniciar sesión para el envío a revisión.
+
+
+### Commit, compilaciones y discrepancia con la versión pública
+
+- Commit `408e238` subido a `origin/main`.
+- Compilaciones 1.5.0 (14) solicitadas con ese commit: Android `a4a5c4f0-bc5e-4a75-9808-9fc9549a1695`; iOS `e92e269f-feac-4947-8be7-52ddad931da5`. Última consulta: ambas IN_PROGRESS; todavía sin enviar a tiendas.
+- Google Play confirma producción activa `1.4.0 (12) · Tanpura`. EAS/App Store Connect API confirma iOS 1.4.0 (13) READY_FOR_DISTRIBUTION.
+- **Envío detenido por discrepancia del código de partida:** el AAB Android publicado incluye ocho ambientes (`birds`, `brown`, `chimes`, `rain`, `storm`, `tanpura`, `waves`, `wind`) en M4A; este checkout solo contiene `rain` y `waves` en WAV. Las builds previas referencian el mismo commit antiguo, por lo que sus modificaciones no están en el historial Git disponible.
+- Se ha solicitado a Pau localizar los cambios de la versión publicada o confirmar expresamente la retirada de esos sonidos. No enviar build 14 antes de resolverlo. No se ha creado ninguna versión de tienda ni enviado a revisión.
+- App Store Connect web sigue solicitando autenticación; la consulta de estado mediante la clave existente de EAS sí funciona.
+
+
+## 2026-09-21 · Recuperación e integración del trabajo local en main
+
+- Localizados en este equipo los cambios sin commit de 1.4.0: ocho ambientes M4A, créditos, traducciones, pruebas, capturas y registro de entregas de septiembre. Conservados en el commit `230b269`.
+- Integrados con `origin/main` (`a5f57f4`), conservando el arranque, selector de duración y atenuación de pantalla de 1.5.0. Los seis idiomas contienen las claves de ambas versiones. Se mantiene la configuración 1.5.0 (14) y la corrección `enableMinifyInReleaseBuilds`.
+- La discrepancia de código queda resuelta en el repositorio; las compilaciones solicitadas desde `408e238` siguen sin incluir los ambientes recuperados. No deben enviarse: hace falta una nueva compilación del código integrado antes de distribuirlo. Esta tarea no solicita compilaciones ni envíos.
+- Instrucción permanente de Pau guardada en `AGENTS.md`: trabajar solo en `main` y cerrar los cambios terminados con verificación, commit y push, comprobando que local y remoto coinciden.
+- Verificación del código integrado: tipos correctos, 32 pruebas unitarias y 42 escenarios Playwright aprobados. No se ha validado en dispositivos el comportamiento nativo.

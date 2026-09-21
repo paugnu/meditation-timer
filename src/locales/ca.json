@@ -128,5 +128,13 @@
   "Ruido marrón": "Soroll marró",
   "Créditos de sonido": "Crèdits de so",
   "Adaptados para reproducción en bucle y volumen equilibrado.": "Adaptats per a la reproducció en bucle i amb el volum equilibrat.",
-  "No se ha podido abrir el enlace.": "No s’ha pogut obrir l’enllaç."
+  "No se ha podido abrir el enlace.": "No s’ha pogut obrir l’enllaç.",
+  "Guardar duración": "Guarda la durada",
+  "Reducir duración": "Reduïx la durada",
+  "Aumentar duración": "Augmenta la durada",
+  "Atenuar pantalla": "Atenua la pantalla",
+  "Reduce el brillo tras 10 segundos sin tocar la pantalla durante la meditación. Toca para recuperarlo.": "Reduïx la brillantor després de 10 segons sense tocar la pantalla durant la meditació. Toca per a recuperar-la.",
+  "Recuperar brillo": "Recupera la brillantor",
+  "Toca para recuperar el brillo": "Toca per a recuperar la brillantor",
+  "No se ha podido ajustar el brillo de la pantalla.": "No s’ha pogut ajustar la brillantor de la pantalla."
 }

@@ -29,6 +29,10 @@
       "ios": {
         "simulator": false
       }
+    },
+    "release": {
+      "extends": "production",
+      "autoIncrement": false
     }
   },
   "submit": {
@@ -36,6 +40,16 @@
       "android": {
         "track": "internal",
         "releaseStatus": "draft"
+      },
+      "ios": {
+        "ascAppId": "6809041268",
+        "appleTeamId": "W543Q9Q8K5"
+      }
+    },
+    "production": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "completed"
       },
       "ios": {
         "ascAppId": "6809041268",
