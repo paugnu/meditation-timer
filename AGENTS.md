@@ -11,7 +11,7 @@ Read this before exploring; it is meant to save you the exploration pass.
 **What this is.** `Meditation Timer · YogaBond`: an Expo SDK 57 / React Native 0.86 / React 19 /
 TypeScript meditation timer for Android, iOS and web. Single screen, offline-only, no accounts, no
 backend, no analytics, no ads. Shipped to Google Play and App Store under `com.pau.meditationtimer`
-(currently 1.1.0, build 8). Source and code comments are English; all user-facing copy is Spanish
+(published 1.4.0: Android build 12 / iOS build 13; next release tracked in app.json). Source and code comments are English; all user-facing copy is Spanish
 keys translated through `src/i18n.ts`.
 
 **Where things live.** See the *Estructura* section of [README.md](README.md) for the file map. The

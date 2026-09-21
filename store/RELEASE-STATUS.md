@@ -328,3 +328,12 @@ Pendiente y no hecho aquí:
 - La discrepancia de código queda resuelta en el repositorio; las compilaciones solicitadas desde `408e238` siguen sin incluir los ambientes recuperados. No deben enviarse: hace falta una nueva compilación del código integrado antes de distribuirlo. Esta tarea no solicita compilaciones ni envíos.
 - Instrucción permanente de Pau guardada en `AGENTS.md`: trabajar solo en `main` y cerrar los cambios terminados con verificación, commit y push, comprobando que local y remoto coinciden.
 - Verificación del código integrado: tipos correctos, 32 pruebas unitarias y 42 escenarios Playwright aprobados. No se ha validado en dispositivos el comportamiento nativo.
+
+
+### 2026-09-21 · Verificación de la recuperación y nueva build 15
+
+- Integrado `4d7ef26` en main con fast-forward, sin cambios locales ni conflictos. Se conserva la instrucción de trabajar siempre en main.
+- Los ocho M4A recuperados son idénticos por SHA-256 a los del AAB público 1.4.0 (12). Se conservan sus créditos, traducciones y preferencias, además del arranque, selector de duración y atenuación nuevos.
+- Verificación repetida en este equipo: TypeScript, 32 pruebas unitarias y 42 escenarios Playwright correctos. Bundles Android/iOS exportados con los ocho M4A y gong; sin conflictos funcionales encontrados. Esto no sustituye una prueba nativa en dispositivos.
+- Corregidas referencias documentales antiguas a la versión publicada y número de escenarios.
+- Se prepara 1.5.0 (15) desde el código integrado para continuar el envío previamente autorizado. Las builds 14 basadas en `408e238` quedan descartadas para distribución; nunca deben enviarse.
