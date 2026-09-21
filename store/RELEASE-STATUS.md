@@ -220,3 +220,13 @@ Pendiente y no hecho aquí:
 - Verificados tipos, 32 pruebas unitarias, 39 escenarios Playwright y exportación de bundles Android/iOS. Brillo físico y arranque nativo pendientes de prueba en dispositivos.
 - Perfil `release` conserva los números explícitos del commit; envío `production` preparado para las tiendas, sin modificar el canal de pruebas.
 - Compilación y envío todavía pendientes. Google Play accesible; App Store Connect solicita iniciar sesión para el envío a revisión.
+
+
+### Commit, compilaciones y discrepancia con la versión pública
+
+- Commit `408e238` subido a `origin/main`.
+- Compilaciones 1.5.0 (14) solicitadas con ese commit: Android `a4a5c4f0-bc5e-4a75-9808-9fc9549a1695`; iOS `e92e269f-feac-4947-8be7-52ddad931da5`. Última consulta: ambas IN_PROGRESS; todavía sin enviar a tiendas.
+- Google Play confirma producción activa `1.4.0 (12) · Tanpura`. EAS/App Store Connect API confirma iOS 1.4.0 (13) READY_FOR_DISTRIBUTION.
+- **Envío detenido por discrepancia del código de partida:** el AAB Android publicado incluye ocho ambientes (`birds`, `brown`, `chimes`, `rain`, `storm`, `tanpura`, `waves`, `wind`) en M4A; este checkout solo contiene `rain` y `waves` en WAV. Las builds previas referencian el mismo commit antiguo, por lo que sus modificaciones no están en el historial Git disponible.
+- Se ha solicitado a Pau localizar los cambios de la versión publicada o confirmar expresamente la retirada de esos sonidos. No enviar build 14 antes de resolverlo. No se ha creado ninguna versión de tienda ni enviado a revisión.
+- App Store Connect web sigue solicitando autenticación; la consulta de estado mediante la clave existente de EAS sí funciona.
