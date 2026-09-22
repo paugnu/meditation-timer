@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   gearWide: { height: 38, marginTop: 0 },
   eyebrowWide: { marginTop: 4 },
   controlsWide: { minHeight: 0, marginTop: 4, marginBottom: 0 },
-  loading: { flex: 1, justifyContent: 'center' }, scroll: { flexGrow: 1, alignItems: 'center', paddingBottom: 100 },
+  loading: { flex: 1, justifyContent: 'center' }, scroll: { flexGrow: 1, alignItems: 'center' },
   clockArea: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 18, paddingBottom: 18, minHeight: 200 },
   readout: { alignItems: 'center', paddingTop: 20 }, time: { fontWeight: '200', fontVariant: ['tabular-nums', 'lining-nums'], letterSpacing: -3 },
   stateLabel: { fontSize: 10, letterSpacing: 2, marginTop: 8, minHeight: 18 }, controls: { minHeight: 110, alignItems: 'center', marginTop: 18, marginBottom: 14 },
