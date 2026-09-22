@@ -540,6 +540,23 @@ test('a running session offers only pause, and finishing goes through it', async
   await page.getByRole('button', { name: 'Pausar meditación', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Finalizar meditación' })).toBeVisible();
 });
+test('portrait adapts to the available height without scrolling or overlapping controls', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Iniciar meditación', exact: true })).toBeEnabled();
+  for (const [width, height] of [[320, 568], [360, 600], [390, 700], [390, 844], [430, 932], [768, 1024]]) {
+    await page.setViewportSize({ width, height });
+    await expect.poll(() => page.evaluate(() => Math.max(0, ...Array.from(document.querySelectorAll('*'))
+      .filter(element => ['auto', 'scroll'].includes(getComputedStyle(element).overflowY))
+      .map(element => element.scrollHeight - element.clientHeight))), { message: `${width} × ${height} should fit` }).toBeLessThanOrEqual(1);
+    const halo = (await page.getByTestId('meditation-halo').boundingBox())!;
+    const countdown = (await page.getByTestId('countdown').boundingBox())!;
+    const gear = (await page.getByRole('button', { name: 'Abrir ajustes' }).boundingBox())!;
+    expect(halo.y).toBeGreaterThanOrEqual(0);
+    expect(halo.y + halo.height).toBeLessThanOrEqual(countdown.y);
+    expect(gear.y + gear.height).toBeLessThanOrEqual(height);
+  }
+});
+
 test('landscape keeps the start button and the controls on screen', async ({ page }) => {
   await page.addInitScript(k => localStorage.setItem(k, JSON.stringify({ settings: { minutes: 20, gong: false } })), key);
   await page.setViewportSize({ width: 844, height: 390 });

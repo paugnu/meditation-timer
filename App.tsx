@@ -28,6 +28,8 @@ function MeditationScreen({ fontsReady }: { fontsReady: boolean }) {
   const [showSettings, setShowSettings] = useState(false);
   const [showDuration, setShowDuration] = useState(false);
   const { width, height } = useWindowDimensions();
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [panelHeight, setPanelHeight] = useState(0);
   const active = timer.status === 'running';
   const dimming = useDimming(settings.dimScreen && !starting, active, timer.endsAt, meditation.notify);
   const chromeOpacity = useRef(new Animated.Value(active ? 0 : 1)).current;
@@ -62,18 +64,20 @@ function MeditationScreen({ fontsReady }: { fontsReady: boolean }) {
   })).current;
   useAmbience(settings.ambience, active, settings.volume, meditation.ambienceHold, meditation.notify);
   const wide = height < 560 && width > height;
+  // Measure inside the safe area and reserve the controls before sizing the halo.
+  const haloSpace = viewportHeight && panelHeight ? Math.floor(viewportHeight - panelHeight - 36) : height;
   const size = wide
     ? Math.max(120, Math.min(width * .42, height * .62, 460))
-    : Math.max(170, Math.min(width - 62, height * .42, 460));
+    : Math.max(120, Math.min(width - 62, height * .42, 460, haloSpace));
   useEffect(() => {
     if (Platform.OS === 'android') void NavigationBar.setVisibilityAsync('visible').catch(() => {});
   }, []);
   return <SafeAreaView onTouchStart={dimming.touch} style={[styles.screen, { backgroundColor: bg }]}>
     <StatusBar style={dark ? 'light' : 'dark'} hidden={false}/>
-    {!ready || !fontsReady ? <View style={styles.loading}/> : <ScrollView aria-hidden={starting || dimming.dimmed} accessibilityElementsHidden={starting || dimming.dimmed} importantForAccessibility={starting || dimming.dimmed ? 'no-hide-descendants' : 'auto'} contentContainerStyle={styles.scroll} bounces={false}>
+    {!ready || !fontsReady ? <View style={styles.loading}/> : <ScrollView onLayout={event => setViewportHeight(event.nativeEvent.layout.height)} aria-hidden={starting || dimming.dimmed} accessibilityElementsHidden={starting || dimming.dimmed} importantForAccessibility={starting || dimming.dimmed ? 'no-hide-descendants' : 'auto'} contentContainerStyle={styles.scroll} bounces={false}>
       <View style={[styles.layout, wide && styles.layoutWide]}>
-      <View style={[styles.clockArea, wide && styles.clockAreaWide]}><ClockFace key={meditation.sessionSequence} running={active} size={size} progress={1 - remainingMs / timer.durationMs} color={palette.accent}/></View>
-      <View style={wide ? styles.panelWide : styles.panel}>
+      <View style={[styles.clockArea, { minHeight: size + 36 }, wide && styles.clockAreaWide]}><ClockFace key={meditation.sessionSequence} running={active} size={size} progress={1 - remainingMs / timer.durationMs} color={palette.accent}/></View>
+      <View onLayout={event => setPanelHeight(event.nativeEvent.layout.height)} style={wide ? styles.panelWide : styles.panel}>
       <View style={styles.readout}>
         <Pressable accessibilityRole="button" accessibilityLabel={active || paused ? t('Tiempo restante {time}', { time: formatTime(remainingMs) }) : t('Cambiar duración, {n} minutos', { n: settings.minutes })} disabled={starting || active || paused || busy || !ready} onPress={() => setShowDuration(true)}>
           <Text testID="countdown" maxFontSizeMultiplier={1.3} style={[styles.time, { color: palette.accent, fontSize: Math.min(width * (wide ? .1 : .205), 100) }]}>{formatTime(remainingMs)}</Text>
