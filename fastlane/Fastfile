@@ -1,0 +1,57 @@
+require "json"
+require "fileutils"
+require "shellwords"
+
+ROOT = File.expand_path("..", __dir__)
+PACKAGE = "com.pau.meditationtimer"
+
+opt_out_usage
+default_platform(:android)
+
+platform :android do
+  desc "Check the version codes already on Google Play without publishing"
+  lane :status do
+    key = File.expand_path(ENV.fetch("GOOGLE_PLAY_JSON_KEY"))
+    %w[internal alpha beta production].each do |track|
+      codes = google_play_track_version_codes(package_name: PACKAGE, json_key: key, track: track)
+      UI.message("#{track}: #{codes.join(', ')}")
+    end
+  end
+
+  desc "Build a signed Android App Bundle locally (no cloud build or upload)"
+  lane :build do
+    credentials = File.expand_path(ENV.fetch("ANDROID_CREDENTIALS", File.join(ROOT, "credentials.json")))
+    UI.user_error!("Missing Android credentials file") unless File.file?(credentials)
+    UI.user_error!("Set BUNDLETOOL_JAR to the bundletool JAR") unless File.file?(ENV.fetch("BUNDLETOOL_JAR", ""))
+    ENV["ANDROID_CREDENTIALS"] = credentials
+    ENV["NODE_ENV"] = "production"
+    Dir.chdir(ROOT) { sh("npx", "expo", "prebuild", "--platform", "android", "--no-install") }
+    gradle(task: "bundle", build_type: "Release", project_dir: File.join(ROOT, "android"),
+      flags: "--no-daemon --max-workers=4 -I #{File.join(ROOT, 'fastlane', 'signing.gradle').shellescape}",
+      properties: { "org.gradle.jvmargs" => "-Xmx6g -XX:MaxMetaspaceSize=1g" })
+    config = JSON.parse(File.read(File.join(ROOT, "app.json"))).fetch("expo")
+    output = File.join(ROOT, "build-artifacts", "meditation-timer-#{config.fetch('version')}-#{config.fetch('android').fetch('versionCode')}.aab")
+    FileUtils.mkdir_p(File.dirname(output))
+    FileUtils.cp(lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH], output)
+    verify(aab: output)
+    UI.success("Verified local bundle: #{output}")
+  end
+
+  desc "Verify a bundle's signature, manifest, bundled audio and release resources"
+  lane :verify do |options|
+    aab = File.expand_path(options.fetch(:aab))
+    sh("python3", File.join(ROOT, "fastlane", "verify_android.py"), aab)
+  end
+
+  desc "Upload an existing verified bundle to Google Play internal testing only"
+  lane :internal do |options|
+    aab = File.expand_path(options.fetch(:aab))
+    key = File.expand_path(ENV.fetch("GOOGLE_PLAY_JSON_KEY"))
+    UI.user_error!("Missing Google Play service account JSON") unless File.file?(key)
+    verify(aab: aab)
+    upload_to_play_store(package_name: PACKAGE, json_key: key, aab: aab,
+      track: "internal", release_status: "completed",
+      skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true,
+      skip_upload_changelogs: true)
+  end
+end

@@ -47,3 +47,11 @@ yarn-error.*
 # Store signing and submission credentials
 /credentials.json
 /secrets/
+
+# Local Fastlane dependencies and build outputs
+/.bundle/
+/vendor/bundle/
+/build-artifacts/
+/fastlane/report.xml
+/fastlane/README.md
+__pycache__/

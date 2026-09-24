@@ -1,0 +1,22 @@
+import groovy.json.JsonSlurper
+
+// Keep signing material out of generated sources, command arguments and logs.
+gradle.beforeProject { project ->
+    if (project.path == ':app') {
+        project.afterEvaluate {
+            def path = System.getenv('ANDROID_CREDENTIALS')
+            if (!path) throw new GradleException('ANDROID_CREDENTIALS is required')
+            def credentialsFile = new File(path)
+            def key = new JsonSlurper().parse(credentialsFile).android.keystore
+            def store = new File(key.keystorePath)
+            if (!store.isAbsolute()) store = new File(credentialsFile.parentFile, key.keystorePath)
+            if (!store.isFile()) throw new GradleException('Upload keystore does not exist')
+            def signing = project.android.signingConfigs.maybeCreate('localRelease')
+            signing.storeFile = store
+            signing.storePassword = key.keystorePassword
+            signing.keyAlias = key.keyAlias
+            signing.keyPassword = key.keyPassword
+            project.android.buildTypes.release.signingConfig = signing
+        }
+    }
+}

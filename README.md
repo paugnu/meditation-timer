@@ -4,7 +4,7 @@ Temporizador de meditación para Android, iOS y web, hecho con **Expo SDK 57 + R
 Sin anuncios, sin cuentas, sin backend y sin analítica: todo —preferencias, sesión en curso e historial—
 se guarda solo en el dispositivo. Publicado bajo la marca YogaBond en Google Play y App Store.
 
-Versión preparada: `1.5.0`, build 15 (Android `versionCode` 15 / iOS `buildNumber` 15).
+Versión preparada: `1.5.0` (Android `versionCode` 16 / iOS `buildNumber` 15).
 El estado de compilación y envío se registra en `store/RELEASE-STATUS.md`.
 Identificador en ambas plataformas: `com.pau.meditationtimer`.
 
@@ -95,12 +95,15 @@ npm run android   # requiere Android SDK + JDK y emulador o dispositivo
 npm run ios       # requiere macOS + Xcode
 ```
 
+Para compilar Android y subirlo a pruebas internas sin EAS Build, ver
+[el flujo local con Fastlane](docs/FASTLANE.md).
+
 ## Verificar
 
 ```bash
 npm run typecheck
 npm test          # 32 pruebas de lógica (node:test vía tsx)
-npm run test:e2e  # 42 escenarios Playwright sobre la vista web; necesita Google Chrome
+npm run test:e2e  # 43 escenarios Playwright sobre la vista web; necesita Google Chrome
 npx expo-doctor
 npx expo export --platform all
 npx expo prebuild --no-install
