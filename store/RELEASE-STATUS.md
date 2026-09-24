@@ -376,3 +376,24 @@ Pendiente y no hecho aquí:
 - Credenciales guardadas como secretos de GitHub; el repositorio es público y el ejecutor es estándar.
 - Verificación local: typecheck, 32 pruebas unitarias, sintaxis Ruby/Python y carga de lanes.
 - Estado en este punto: automatización preparada; todavía no se ha confirmado compilación ni subida del build 16.
+
+### Resultado — iOS 1.5.1 (16) disponible en TestFlight
+
+- Ejecución correcta: https://github.com/paugnu/meditation-timer/actions/runs/35954365235
+  sobre el commit `b111c24adf7822c2db1a4b426e330043e0ab57ec`.
+- Trabajo macOS: 04:08:36–04:21:31 UTC (12 min 55 s, incluidas instalación,
+  compilación, subida y espera de Apple). Ejecutor estándar en repositorio público,
+  sin EAS Build ni coste de compilación de Expo.
+- IPA `meditation-timer-1.5.1-16.ipa`, 72.543.409 bytes.
+  SHA-256: `951b73b6948715402e6b28e065e57201c330c24da4971c68ab8ce69656e6b8ef`.
+- Pasaron typecheck, 32 pruebas y verificación del IPA real en macOS: firma/equipo,
+  perfil App Store vigente, versión/build, permisos y los nueve archivos de audio.
+  Copia descargada localmente con el mismo SHA-256. Llavero y secretos temporales
+  eliminados al finalizar; paso de limpieza confirmado correcto.
+- Apple confirmó subida a las 04:18 UTC y procesado a las 04:21 UTC.
+  Build ASC `2c8d72fe-a928-4a1b-9924-48cda5b1fc14`: `VALID`, versión `1.5.1`,
+  `internalBuildState: IN_BETA_TESTING`, notificación automática habilitada.
+  Fastlane confirma distribución a probadores internos; grupo «Pruebas internas»
+  configurado con acceso a todas las compilaciones.
+- No se ha enviado 1.5.1 a App Review ni publicado esa versión en App Store.
+  Pendiente probar en un iPhone real antes de solicitar publicación.
