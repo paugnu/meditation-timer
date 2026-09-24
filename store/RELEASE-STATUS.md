@@ -365,3 +365,14 @@ Pendiente y no hecho aquí:
 - Pau autoriza publicar directamente con las claves existentes. Promovido el código 16 de `internal` a `production` con Fastlane y la cuenta de servicio de Google Play, sin recompilar ni volver a subir el AAB.
 - Google Play aceptó el commit con `changes_not_sent_for_review=false`, sin recurrir a guardar un borrador. Consulta independiente posterior confirma `production`, versión 1.5.0, código 16, estado `completed` (lanzamiento completo, sin fracción gradual).
 - Esto confirma la entrega a producción por API; no confirma aprobación de una eventual revisión de Google ni disponibilidad pública en dispositivos. No se ha realizado ninguna operación en iOS.
+
+
+## 2026-09-24 — Preparación de iOS con Fastlane y GitHub Actions
+
+- App Store Connect confirma `1.5.0` en `READY_FOR_DISTRIBUTION`; último build `15`, `VALID`.
+- Preparada `1.5.1` (iOS build `16`) con los ajustes de pantalla posteriores al build 15.
+- Recuperados certificado y perfil App Store existentes desde Expo, vigentes hasta 2027-03-11.
+- Configurado flujo manual `iOS TestFlight` en `main`, macOS 26 / Xcode 26.6, límite 60 minutos.
+- Credenciales guardadas como secretos de GitHub; el repositorio es público y el ejecutor es estándar.
+- Verificación local: typecheck, 32 pruebas unitarias, sintaxis Ruby/Python y carga de lanes.
+- Estado en este punto: automatización preparada; todavía no se ha confirmado compilación ni subida del build 16.

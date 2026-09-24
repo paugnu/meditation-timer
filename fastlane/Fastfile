@@ -1,6 +1,7 @@
 require "json"
 require "fileutils"
 require "shellwords"
+require "tmpdir"
 
 ROOT = File.expand_path("..", __dir__)
 PACKAGE = "com.pau.meditationtimer"
@@ -53,5 +54,71 @@ platform :android do
       track: "internal", release_status: "completed",
       skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true,
       skip_upload_changelogs: true)
+  end
+end
+
+platform :ios do
+  desc "Build and verify an App Store IPA with the existing distribution credentials"
+  lane :build do
+    require "securerandom"
+    require "time"
+    UI.user_error!("iOS builds require macOS and Xcode 26.4+") unless RUBY_PLATFORM.include?("darwin")
+    signing = File.expand_path(ENV.fetch("IOS_SIGNING_DIR", File.join(ROOT, "secrets")))
+    profile_path = File.join(signing, "ios.mobileprovision")
+    profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
+    team = "W543Q9Q8K5"
+    UI.user_error!("Wrong provisioning profile") unless profile.fetch("Entitlements").fetch("application-identifier") == "#{team}.#{PACKAGE}"
+    UI.user_error!("Expired provisioning profile") unless Time.parse(profile.fetch("ExpirationDate").to_s) > Time.now
+    UI.user_error!("Expected an App Store profile") if profile["ProvisionedDevices"] || profile["ProvisionsAllDevices"] || profile.fetch("Entitlements")["get-task-allow"]
+    config = JSON.parse(File.read(File.join(ROOT, "app.json"))).fetch("expo")
+    keychain = File.join(ENV.fetch("RUNNER_TEMP", Dir.tmpdir), "meditation-#{SecureRandom.hex(8)}.keychain-db")
+    password = SecureRandom.hex(32)
+    installed_profile = nil
+    begin
+      create_keychain(path: keychain, password: password, default_keychain: false,
+        unlock: true, timeout: 3600, add_to_search_list: true)
+      import_certificate(certificate_path: File.join(signing, "ios-distribution.p12"),
+        certificate_password: File.read(File.join(signing, "ios-certificate-password.txt")).strip,
+        keychain_path: keychain, keychain_password: password)
+      installed_profile = install_provisioning_profile(path: profile_path)
+      ENV["NODE_ENV"] = "production"
+      Dir.chdir(ROOT) { sh("npx", "expo", "prebuild", "--platform", "ios", "--no-install") }
+      cocoapods(podfile: File.join(ROOT, "ios", "Podfile"), use_bundle_exec: true)
+      project_path = Dir[File.join(ROOT, "ios", "*.xcodeproj")].fetch(0)
+      project = Xcodeproj::Project.open(project_path)
+      target = project.targets.find { |t| t.product_type == "com.apple.product-type.application" }
+      UI.user_error!("Missing iOS application target") unless target
+      update_code_signing_settings(path: project_path, use_automatic_signing: false,
+        targets: [target.name], build_configurations: ["Release"], team_id: team,
+        code_sign_identity: "Apple Distribution", profile_name: profile.fetch("Name"),
+        profile_uuid: profile.fetch("UUID"))
+      output = "meditation-timer-#{config.fetch('version')}-#{config.fetch('ios').fetch('buildNumber')}.ipa"
+      build_app(workspace: Dir[File.join(ROOT, "ios", "*.xcworkspace")].fetch(0),
+        scheme: target.name, configuration: "Release", clean: true, export_method: "app-store",
+        output_directory: File.join(ROOT, "build-artifacts"), output_name: output,
+        buildlog_path: File.join(ROOT, "build-artifacts", "logs"),
+        export_options: { method: "app-store-connect", signingStyle: "manual", teamID: team,
+          manageAppVersionAndBuildNumber: false, provisioningProfiles: { PACKAGE => profile.fetch("UUID") } })
+      verify(ipa: File.join(ROOT, "build-artifacts", output))
+    ensure
+      FileUtils.rm_f(installed_profile) if installed_profile
+      delete_keychain(keychain_path: keychain) if File.exist?(keychain)
+    end
+  end
+
+  desc "Verify the actual IPA before uploading"
+  lane :verify do |options|
+    sh("python3", File.join(ROOT, "fastlane", "verify_ios.py"), File.expand_path(options.fetch(:ipa)))
+  end
+
+  desc "Upload an existing verified IPA to internal TestFlight only"
+  lane :internal do |options|
+    ipa = File.expand_path(options.fetch(:ipa))
+    verify(ipa: ipa)
+    upload_to_testflight(api_key_path: File.expand_path(ENV.fetch("ASC_API_KEY_PATH")),
+      app_identifier: PACKAGE, apple_id: "6809041268", ipa: ipa,
+      distribute_external: false, skip_waiting_for_build_processing: false,
+      wait_processing_timeout_duration: 900, wait_processing_interval: 30,
+      uses_non_exempt_encryption: false)
   end
 end

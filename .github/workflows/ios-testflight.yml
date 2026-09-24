@@ -1,0 +1,71 @@
+name: iOS TestFlight
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ios-testflight
+  cancel-in-progress: false
+jobs:
+  testflight:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      FASTLANE_OPT_OUT_USAGE: '1'
+      FASTLANE_SKIP_UPDATE_CHECK: '1'
+      FASTLANE_HIDE_CHANGELOG: '1'
+      IOS_SIGNING_DIR: ${{ runner.temp }}/ios-signing
+      ASC_API_KEY_PATH: ${{ runner.temp }}/ios-signing/asc-api-key.json
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.23.3'
+          cache: npm
+      - uses: ruby/setup-ruby@762794c140bbeda0f1224786aa33b4b46783a6c1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Select Xcode 26.6
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
+          xcodebuild -version
+      - name: Install dependencies and verify app
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+      - name: Restore signing credentials
+        env:
+          IOS_DISTRIBUTION_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_P12_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          ASC_API_KEY_JSON: ${{ secrets.ASC_API_KEY_JSON }}
+        run: python3 fastlane/restore_ios_signing.py
+      - name: Build and verify IPA
+        run: bundle exec fastlane ios build
+      - name: Save verified IPA and build logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ios-${{ github.sha }}
+          path: |
+            build-artifacts/*.ipa
+            build-artifacts/*.json
+            build-artifacts/logs/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload to TestFlight and wait for Apple processing
+        run: |
+          IPA=$(find build-artifacts -maxdepth 1 -name '*.ipa' -print -quit)
+          bundle exec fastlane ios internal "ipa:$PWD/$IPA"
+      - name: Remove temporary credentials
+        if: always()
+        run: |
+          rm -rf "$IOS_SIGNING_DIR"
+          for keychain in "$RUNNER_TEMP"/meditation-*.keychain-db; do
+            [ ! -f "$keychain" ] || security delete-keychain "$keychain"
+          done

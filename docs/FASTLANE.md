@@ -1,8 +1,8 @@
-# Android local con Fastlane
+# Compilaciones con Fastlane
 
 Fastlane compila un AAB firmado y lo verifica antes de permitir una subida al canal
-interno de Google Play. No usa EAS Build ni modifica el canal de producción. iOS
-sigue usando el proceso existente; la automatización con macOS está pendiente.
+interno de Google Play. No usa EAS Build ni modifica el canal de producción. iOS se compila en macOS
+con GitHub Actions y se sube a TestFlight por API.
 
 ## Preparación
 
@@ -72,3 +72,50 @@ bundle exec fastlane android internal aab:/ruta/absoluta/al/paquete.aab
 sin cambiar textos, capturas ni imágenes de la ficha. No inicia otra compilación.
 Una carga correcta no demuestra que el paquete esté disponible: confirmar el código
 en el canal interno con `status` y registrar el resultado en `store/RELEASE-STATUS.md`.
+
+## iOS: GitHub Actions → TestFlight
+
+El flujo `.github/workflows/ios-testflight.yml` se ejecuta manualmente en `main`,
+con un máximo de 60 minutos y una sola ejecución simultánea. Usa el ejecutor
+estándar `macos-26`, Xcode 26.6, Node 22 y Ruby 3.3. El repositorio público permite
+usar ejecutores estándar gratuitamente; si cambia su visibilidad, revisar la cuota.
+
+Los secretos del repositorio son:
+
+- `IOS_DISTRIBUTION_P12_BASE64`: certificado existente con su clave privada, en base64.
+- `IOS_CERTIFICATE_PASSWORD`: contraseña de ese certificado.
+- `IOS_PROVISIONING_PROFILE_BASE64`: perfil App Store para `com.pau.meditationtimer`.
+- `ASC_API_KEY_JSON`: JSON Fastlane con `key_id`, `issuer_id`, `key` e `in_house: false`.
+
+Las claves se restauran únicamente en el directorio temporal. Fastlane crea un
+llavero temporal, importa la firma y configura el proyecto iOS generado por Expo.
+El llavero y el perfil instalado se eliminan al terminar; el flujo también limpia
+las credenciales si falla un paso. No se exportan secretos como artefactos.
+
+Antes de lanzar el flujo, consultar App Store Connect, asignar una versión válida y
+un `ios.buildNumber` no usado en `app.json`, verificar los cambios y subirlos a `main`.
+En GitHub: **Actions → iOS TestFlight → Run workflow → main**.
+
+El flujo ejecuta typecheck y pruebas unitarias, genera iOS, instala CocoaPods,
+compila y verifica el IPA real: firma, identificador y equipo, versión, perfil App
+Store vigente, ausencia de firma debug y permiso de micrófono, JavaScript de
+producción, y hashes del gong y los ocho ambientes. Guarda el IPA y un recibo con
+SHA-256 durante siete días. Después lo sube y espera hasta 15 minutos al procesado
+por Apple. Si esa espera expira, consultar Apple antes de repetir una subida.
+Una compilación válida no sustituye las pruebas físicas en iPhone.
+
+Para hacerlo desde un Mac local con Xcode 26.4 o posterior:
+
+```bash
+npm ci
+bundle install
+export IOS_SIGNING_DIR=/ruta/privada/ios-signing
+export ASC_API_KEY_PATH=/ruta/privada/asc-api-key.json
+bundle exec fastlane ios build
+bundle exec fastlane ios internal ipa:/ruta/absoluta/al/paquete.ipa
+```
+
+La carpeta de firma contiene `ios-distribution.p12`, `ios-certificate-password.txt`
+y `ios.mobileprovision`. La tarea `internal` no envía la versión a App Review ni
+publica en App Store. Confirmar el procesado y acceso del grupo interno en Apple,
+y añadir el resultado a `store/RELEASE-STATUS.md`.
