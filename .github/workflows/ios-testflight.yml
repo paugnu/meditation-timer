@@ -16,8 +16,6 @@ jobs:
       FASTLANE_OPT_OUT_USAGE: '1'
       FASTLANE_SKIP_UPDATE_CHECK: '1'
       FASTLANE_HIDE_CHANGELOG: '1'
-      IOS_SIGNING_DIR: ${{ runner.temp }}/ios-signing
-      ASC_API_KEY_PATH: ${{ runner.temp }}/ios-signing/asc-api-key.json
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -30,6 +28,10 @@ jobs:
         with:
           ruby-version: '3.3'
           bundler-cache: true
+      - name: Set temporary signing paths
+        run: |
+          echo "IOS_SIGNING_DIR=$RUNNER_TEMP/ios-signing" >> "$GITHUB_ENV"
+          echo "ASC_API_KEY_PATH=$RUNNER_TEMP/ios-signing/asc-api-key.json" >> "$GITHUB_ENV"
       - name: Select Xcode 26.6
         run: |
           sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
