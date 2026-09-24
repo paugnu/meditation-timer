@@ -359,3 +359,9 @@ Pendiente y no hecho aquí:
 - TypeScript y 32 pruebas unitarias correctos. Sintaxis de Fastfile y verificador Python comprobada; acceso de Fastlane a los canales de Play confirmado. La compilación/verificación no sustituye una prueba física de scroll, audio, brillo, notificaciones y No molestar.
 - **Subida interna completada con Fastlane:** `upload_to_play_store` terminó correctamente; consulta independiente posterior de Google Play Developer API confirma canal `internal`, versión 1.5.0, código 16, estado `completed`. El canal `production` conserva código 15, estado `completed`. La llegada de la actualización al dispositivo puede requerir propagación; no se ha comprobado una instalación física.
 - Enlace del canal interno existente: https://play.google.com/apps/internaltest/4701601392540903008 . No se ha publicado el código 16 en producción ni se ha cancelado el plan de Expo.
+
+### 2026-09-24 · Promoción de Android 1.5.0 (16) a producción
+
+- Pau autoriza publicar directamente con las claves existentes. Promovido el código 16 de `internal` a `production` con Fastlane y la cuenta de servicio de Google Play, sin recompilar ni volver a subir el AAB.
+- Google Play aceptó el commit con `changes_not_sent_for_review=false`, sin recurrir a guardar un borrador. Consulta independiente posterior confirma `production`, versión 1.5.0, código 16, estado `completed` (lanzamiento completo, sin fracción gradual).
+- Esto confirma la entrega a producción por API; no confirma aprobación de una eventual revisión de Google ni disponibilidad pública en dispositivos. No se ha realizado ninguna operación en iOS.
