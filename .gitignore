@@ -39,6 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+/modules/meditation-focus/android/build/
 
 # Test artifacts
 /test-results/
