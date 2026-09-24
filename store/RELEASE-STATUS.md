@@ -397,3 +397,26 @@ Pendiente y no hecho aquí:
   configurado con acceso a todas las compilaciones.
 - No se ha enviado 1.5.1 a App Review ni publicado esa versión en App Store.
   Pendiente probar en un iPhone real antes de solicitar publicación.
+
+## 2026-09-24 — iOS 1.5.1 (16) enviada a App Review
+
+- El usuario confirma haber probado la versión de TestFlight y autoriza su publicación.
+- Revisión previa: versión pública `1.5.0`; nueva versión `1.5.1`, build `16`,
+  `VALID` y `APP_STORE_ELIGIBLE`, identificador `com.pau.meditationtimer`.
+  El IPA local conserva el SHA-256 registrado arriba y coincide con `app.json`;
+  desde el commit de compilación solo había cambiado el registro de publicación.
+- Ficha española conservada: descripción, palabras clave, URLs y contacto de revisión.
+  Ocho capturas de iPhone y ocho de iPad completas, con los mismos hashes y orden
+  que la versión publicada. URLs de producto, soporte y privacidad responden HTTP 200.
+  Clasificación heredada `FOUR_PLUS`, sin cuenta de demostración requerida.
+- Novedades: «Mejoramos la adaptación de la pantalla a distintos tamaños de iPhone
+  y eliminamos el espacio vacío y el desplazamiento innecesario al final de la
+  pantalla principal.»
+- Versión ASC: `5e9bd5e3-0953-48d5-bd78-6f004d61dbbb`, asociada al build
+  `2c8d72fe-a928-4a1b-9924-48cda5b1fc14` (16).
+- Envío: `aaf3d243-9868-4c7e-8bae-3f6399f7fc52`, presentado a las
+  `2026-09-24T04:42:30.841Z`; consulta posterior confirma `WAITING_FOR_REVIEW`
+  tanto en la versión como en el envío.
+- Publicación automática configurada: `releaseType: AFTER_APPROVAL`.
+  **Todavía no aprobada ni publicada:** pendiente de revisión de Apple.
+  No se ha generado otra compilación ni modificado la publicación de Android.
