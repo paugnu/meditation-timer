@@ -4,7 +4,7 @@ Temporizador de meditación para Android, iOS y web, hecho con **Expo SDK 57 + R
 Sin anuncios, sin cuentas, sin backend y sin analítica: todo —preferencias, sesión en curso e historial—
 se guarda solo en el dispositivo. Publicado bajo la marca YogaBond en Google Play y App Store.
 
-Versión preparada: `1.6.0` (Android `versionCode` 17 / iOS `buildNumber` 17).
+Versión compilada en GitHub y enviada a revisión: `1.6.0` (Android `versionCode` 17 / iOS `buildNumber` 17).
 Últimas versiones confirmadas antes de esta entrega: Android `1.5.0` (16) e iOS `1.5.1` (16).
 El estado de compilación y envío se registra en `store/RELEASE-STATUS.md`.
 Identificador en ambas plataformas: `com.pau.meditationtimer`.

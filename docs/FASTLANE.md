@@ -97,6 +97,11 @@ Con `publish=true`, `fastlane android publish` envía el AAB a producción con l
 completo y `changes_not_sent_for_review=false`. No convierte silenciosamente un fallo de revisión
 en un borrador. Conserva textos e imágenes de la ficha y añade las novedades en español.
 Confirmar después el código en Google Play y distinguir envío aceptado de aprobación/disponibilidad.
+Si el AAB introduce un permiso nuevo, revisar también **Contenido de la aplicación**: la API puede
+aceptar la subida y dejar una declaración pendiente. Para `FOREGROUND_SERVICE_MEDIA_PLAYBACK`,
+la declaración requiere el caso de reproducción multimedia y un enlace público a un vídeo real
+del inicio y uso de la función. Guardar la declaración y enviarla desde **Resumen de publicación**;
+comprobar que no queden cambios sin enviar. El vídeo de 1.6.0 está en `store/review/`.
 
 ## iOS: GitHub Actions → TestFlight y App Store
 

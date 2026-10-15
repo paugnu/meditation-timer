@@ -145,3 +145,19 @@ Cada sesión de la lista diaria ofrece Eliminar registro, con confirmación en l
 - Pendiente en una nueva build instalada: diez minutos en otra app y con pantalla bloqueada en Android/iPhone; salir durante el gong y durante un cambio de ambiente; comprobar el fundido y la parada a cero sin regresar; volver sin gong duplicado; pausar/continuar desde la app; controles multimedia Android antes/después del vencimiento; llamadas y cambios de salida de audio. No hay dispositivos conectados en este entorno.
 - Análisis de los seis archivos solicitados y comparación con AAB/IPA anteriores en [AMBIENCE-AUDIT.md](AMBIENCE-AUDIT.md). Ningún audio modificado; pájaros y tanpura excluidos del análisis.
 - No se ha enviado ni publicado ninguna nueva versión en tiendas. Las comprobaciones de permisos de una futura distribución deben hacerse también sobre su AAB/IPA, no sobre esta build de desarrollo.
+
+
+## Distribución 1.6.0 (17), compilaciones en GitHub (2026-10-15)
+
+- Compilación nativa de distribución correcta en macOS 26 / Xcode 26.6, incluido Swift y el módulo local `meditation-audio`. IPA verificado en el ejecutor: firma App Store, equipo, perfil vigente, versión/build, audio en segundo plano, ausencia de permiso de micrófono y hashes de los nueve sonidos.
+- Copia local del IPA descargada de GitHub con el mismo SHA-256: `3243c95e64c24e871ecb9efb326508294ffe397db2605ef693dc067df8493bf4`. La comprobación del paquete no sustituye los escenarios físicos pendientes descritos arriba.
+- Compilación Android de distribución correcta en Ubuntu 24.04 / JDK 17. AAB real verificado: firma de subida existente, versión/código, permisos bloqueados, un único servicio multimedia privado, permisos de reproducción y wake lock, restauración de No molestar, mapping R8, color del splash y nueve sonidos. Copia local con SHA-256 coincidente: `f98af54899abbca672d5ccf2369d2258d3b3edef6e87beafeb8b23469fbb44aa`.
+- El estado de envío y aprobación de las tiendas se registra en `store/RELEASE-STATUS.md`.
+
+
+### Demostración nativa Android para la declaración FGS (2026-10-15)
+
+- AAB 1.6.0 (17) convertido a APK universal para un emulador aislado Android 16 / API 36; firma efímera de pruebas, código y recursos del AAB de distribución. Sin cuentas ni datos personales. Interacción con la interfaz a través del visor del emulador, grabación nativa de pantalla y salida de audio exclusiva del emulador, sin micrófono.
+- Sesión de un minuto con «Lluvia suave»: elegir ambiente en reposo permanece en silencio, iniciar activa audio, salir a Inicio conserva la reproducción y el panel de Android muestra el control multimedia. Lectura nativa durante segundo plano: `AudioControlsService` en primer plano, tipo `0x00000002`, MediaSession `PLAYING` y señal de audio presente.
+- Al vencer sin regresar a la app desaparecen la sesión multimedia y la notificación del servicio; el último segundo de la salida de audio tiene pico y RMS cero. Volver muestra `00:00` y «SESIÓN COMPLETADA», sin reiniciar el ambiente. No se sustituye con esto la prueba en teléfonos físicos de Android e iOS, llamadas, cambios de salida o suspensión prolongada.
+- Grabación conservada en `store/review/background-audio-1.6.0.mp4` y enviada como evidencia de la declaración FGS. Emulador, visor y sink privados cerrados al terminar.

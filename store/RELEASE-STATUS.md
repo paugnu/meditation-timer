@@ -435,3 +435,65 @@ Pendiente y no hecho aquí:
 - Flujo Android nuevo y flujo iOS ampliado: compilación firmada, verificación del paquete real, artefactos recuperables y envío público con entrada manual `publish=true`. No se alteran las fichas ni las capturas existentes; se añaden las novedades del audio en segundo plano.
 - Credenciales Android existentes añadidas como secretos cifrados del mismo repositorio. Los ejecutores las restauran solo en archivos temporales privados y las eliminan al terminar.
 - TypeScript, 32 pruebas unitarias y validaciones de scripts/workflows correctas. Las 47 pruebas web ya pasaron para el cambio funcional. Compilaciones y envíos pendientes de confirmar en los resultados siguientes.
+
+### Resultado — iOS 1.6.0 (17) enviada a App Review
+
+- GitHub Actions correcto: https://github.com/paugnu/meditation-timer/actions/runs/38715084192
+  sobre `2ac97ad6a47e3cd3aa7580c2d915ee016cb4514d`, de 09:44:00 a 09:58:17 UTC (14 min 17 s).
+- IPA firmado `meditation-timer-1.6.0-17.ipa`, 72.559.579 bytes; SHA-256
+  `3243c95e64c24e871ecb9efb326508294ffe397db2605ef693dc067df8493bf4`.
+  La descarga local coincide. Verificados en macOS la firma/equipo, perfil App Store vigente,
+  versión/build, capacidad de audio en segundo plano, ausencia de permiso de micrófono y nueve sonidos.
+  Pruebas unitarias y tipos correctos; limpieza de credenciales y llavero confirmada.
+- TestFlight procesado y distribuido a probadores internos a las 09:57 UTC.
+  Build `1197982a-3f10-4911-a1b8-acdc073ea524` (17), `VALID`.
+- Versión `86c70e3b-1488-4961-8a4c-35faaaea5619` (1.6.0), asociada al build 17.
+  Envío `1107b816-1c16-4963-8c0a-6552ea7e18c9`, presentado a las
+  `2026-10-15T09:58:03.828Z` (11:58 en Madrid).
+- Consulta independiente de App Store Connect a las 09:59:30 UTC confirma `WAITING_FOR_REVIEW`
+  y `AFTER_APPROVAL`. Ficha, copyright y locales conservados; solo cambian las novedades.
+  Las 16 capturas heredadas (8 iPhone y 8 iPad) mantienen hashes, dimensiones y orden, todas completas.
+- **Pendiente de aprobación de Apple; todavía no publicada.** Las pruebas físicas de reproducción
+  siguen pendientes; la compilación y verificación nativas no las sustituyen.
+
+### Resultado — Android 1.6.0 (17) enviada a producción desde GitHub
+
+- GitHub Actions correcto: https://github.com/paugnu/meditation-timer/actions/runs/38716694416
+  sobre `c5d9d67370c2c7983787cf94a4dca2784c82f38c`, de 09:56:56 a 10:10:33 UTC (13 min 37 s).
+  Los intentos previos se corrigieron por la ruta de sdkmanager del ejecutor y el formato numérico
+  de `foregroundServiceType` emitido por bundletool; no subieron paquetes.
+- AAB firmado `meditation-timer-1.6.0-17.aab`, 115.917.862 bytes; SHA-256
+  `f98af54899abbca672d5ccf2369d2258d3b3edef6e87beafeb8b23469fbb44aa`.
+  La descarga local coincide. Verificados firma original, versión/código, permisos bloqueados,
+  servicio multimedia privado y permisos, restauración DND, mapping, splash y nueve sonidos.
+  TypeScript, 32 pruebas unitarias y limpieza de secretos temporales correctos.
+- Envío a `production` con lanzamiento completo y envío a revisión activado, aceptado a las
+  10:10:28 UTC. Consulta independiente de Play confirma código `17` en producción y `16` en interno.
+  Novedades en español actualizadas; ficha e imágenes no se modifican desde Fastlane.
+- Play Console muestra 1.6.0 en «Cambios en revisión», todavía ejecutando comprobaciones rápidas,
+  con publicación gestionada desactivada. Esto **no confirma aprobación ni disponibilidad pública**.
+- Tras el envío aparece una declaración pendiente de `FOREGROUND_SERVICE_MEDIA_PLAYBACK`.
+  Google exige un enlace de vídeo que demuestre cómo se inicia la reproducción; se está preparando
+  la demostración con el paquete de distribución para completar ese requisito.
+
+
+### Declaración de servicios en primer plano completada y enviada
+
+- Preparada una demostración real del APK derivado del AAB 17 en un emulador API 36 aislado,
+  sin cuentas ni datos personales. Se comprueban reproducción fuera de la app, controles Android,
+  parada automática al vencer y regreso a `00:00` sin reiniciar audio. Evidencia nativa y límites
+  de esta prueba registrados en `docs/VALIDATION.md`.
+- Vídeo H264/AAC de 167,60 s, 7.477.563 bytes, guardado en `store/review/background-audio-1.6.0.mp4`.
+  SHA-256: `206975f3c393c9ef16c9b8244dab8d2c3e41c33cac9f726394041a4ae10ca56d`.
+  Enlace público de revisión fijado al commit `a82ba0f98637d42ab36aeb3a0d267ee90c9652fc`:
+  https://raw.githubusercontent.com/paugnu/meditation-timer/a82ba0f98637d42ab36aeb3a0d267ee90c9652fc/store/review/background-audio-1.6.0.mp4
+- Declarado solo el uso «Reproducción de contenido multimedia» para
+  `FOREGROUND_SERVICE_MEDIA_PLAYBACK`, guardado el vídeo y enviada la declaración a Google.
+  Google reinicia la revisión para incluir este requisito junto con la versión 1.6.0.
+- Confirmación visual a las 10:30 UTC: 1.6.0 e información de servicios en primer plano
+  figuran en «Cambios en revisión»; no quedan cambios sin enviar. Las comprobaciones rápidas
+  se han reiniciado y el paso a revisión es automático. Publicación gestionada desactivada:
+  el lanzamiento completo se publicará automáticamente cuando Google lo apruebe.
+- **No se confirma aprobación ni disponibilidad pública en ninguna tienda.** iOS sigue enviado
+  a App Review con publicación automática. El emulador y sus servicios temporales se han cerrado,
+  conservando la grabación y las evidencias; no se han modificado los dispositivos ni el audio del usuario.
