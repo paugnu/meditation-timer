@@ -5,6 +5,7 @@ require "tmpdir"
 
 ROOT = File.expand_path("..", __dir__)
 PACKAGE = "com.pau.meditationtimer"
+RELEASE_NOTES = "El sonido de fondo continúa al cambiar de aplicación o bloquear la pantalla durante la meditación y se detiene suavemente al terminar."
 
 opt_out_usage
 default_platform(:android)
@@ -54,6 +55,24 @@ platform :android do
       track: "internal", release_status: "completed",
       skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true,
       skip_upload_changelogs: true)
+  end
+
+  desc "Upload a verified bundle to production and send changes for Google review"
+  lane :publish do |options|
+    aab = File.expand_path(options.fetch(:aab))
+    key = File.expand_path(ENV.fetch("GOOGLE_PLAY_JSON_KEY"))
+    UI.user_error!("Missing Google Play service account JSON") unless File.file?(key)
+    verify(aab: aab)
+    Dir.mktmpdir("meditation-play-metadata-") do |metadata|
+      notes = File.join(metadata, "es-ES", "changelogs")
+      FileUtils.mkdir_p(notes)
+      File.write(File.join(notes, "default.txt"), RELEASE_NOTES + "\n")
+      upload_to_play_store(package_name: PACKAGE, json_key: key, aab: aab,
+        track: "production", release_status: "completed",
+        changes_not_sent_for_review: false, rescue_changes_not_sent_for_review: false,
+        metadata_path: metadata, skip_upload_metadata: true, skip_upload_images: true,
+        skip_upload_screenshots: true, skip_upload_changelogs: false)
+    end
   end
 end
 
@@ -120,5 +139,26 @@ platform :ios do
       distribute_external: false, skip_waiting_for_build_processing: false,
       wait_processing_timeout_duration: 900, wait_processing_interval: 30,
       uses_non_exempt_encryption: false)
+  end
+
+  desc "Submit the processed release build to App Review with automatic publication after approval"
+  lane :publish do
+    config = JSON.parse(File.read(File.join(ROOT, "app.json"))).fetch("expo")
+    key_path = File.expand_path(ENV.fetch("ASC_API_KEY_PATH"))
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from_json_file(key_path)
+    app = Spaceship::ConnectAPI::App.get(app_id: "6809041268")
+    editable = app.get_edit_app_store_version(platform: Spaceship::ConnectAPI::Platform::IOS)
+    if editable && editable.version_string != config.fetch("version")
+      UI.user_error!("Another App Store version is being edited: #{editable.version_string}")
+    end
+    # New versions inherit the live listing. An empty metadata directory limits edits to these notes.
+    Dir.mktmpdir("meditation-app-store-metadata-") do |metadata|
+      upload_to_app_store(api_key_path: key_path, app_identifier: PACKAGE,
+        app_version: config.fetch("version"), build_number: config.fetch("ios").fetch("buildNumber"),
+        skip_binary_upload: true, skip_screenshots: true, metadata_path: metadata,
+        release_notes: { "es-ES" => RELEASE_NOTES }, force: true,
+        submit_for_review: true, automatic_release: true, run_precheck_before_submit: false,
+        submission_information: { export_compliance_uses_encryption: false })
+    end
   end
 end

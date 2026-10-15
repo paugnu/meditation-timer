@@ -1,6 +1,11 @@
-name: iOS TestFlight
+name: iOS TestFlight and App Store
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Submit to App Review after TestFlight processing
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -64,6 +69,9 @@ jobs:
         run: |
           IPA=$(find build-artifacts -maxdepth 1 -name '*.ipa' -print -quit)
           bundle exec fastlane ios internal "ipa:$PWD/$IPA"
+      - name: Submit to App Review
+        if: inputs.publish
+        run: bundle exec fastlane ios publish
       - name: Remove temporary credentials
         if: always()
         run: |

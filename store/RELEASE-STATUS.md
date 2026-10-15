@@ -427,3 +427,11 @@ Pendiente y no hecho aquí:
 - TypeScript, 32 pruebas unitarias, 47 escenarios web, compilación Android de desarrollo y exportación del bundle iOS verificados. Swift y reproducción física pendientes de comprobar en una nueva build instalada; detalles en `docs/VALIDATION.md`.
 - Seis grabaciones auditadas, sin sustituciones: tormenta 14:19, viento 1:39 y campanas 2:15. Pájaros y tanpura intactos. Informe en `docs/AMBIENCE-AUDIT.md`.
 - No se ha generado un AAB/IPA de distribución ni enviado nada a Google Play, TestFlight o App Review. La versión instalada no recibe este cambio todavía. Antes de una próxima subida, incrementar los números de versión/build que corresponda; `app.json` conserva los de la última entrega.
+
+## 2026-10-15 — Compilación y publicación de 1.6.0 (17) autorizadas
+
+- El usuario solicita compilar y publicar iOS y Android mediante GitHub. Preparada versión `1.6.0`, Android código `17` e iOS build `17`.
+- Consulta previa: Google Play devuelve código `16` en interno y producción; App Store Connect confirma `1.5.1` en `READY_FOR_SALE`, último build `16` válido.
+- Flujo Android nuevo y flujo iOS ampliado: compilación firmada, verificación del paquete real, artefactos recuperables y envío público con entrada manual `publish=true`. No se alteran las fichas ni las capturas existentes; se añaden las novedades del audio en segundo plano.
+- Credenciales Android existentes añadidas como secretos cifrados del mismo repositorio. Los ejecutores las restauran solo en archivos temporales privados y las eliminan al terminar.
+- TypeScript, 32 pruebas unitarias y validaciones de scripts/workflows correctas. Las 47 pruebas web ya pasaron para el cambio funcional. Compilaciones y envíos pendientes de confirmar en los resultados siguientes.

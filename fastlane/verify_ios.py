@@ -38,7 +38,7 @@ def verify(ipa):
         require(info['CFBundleVersion'] == config['ios']['buildNumber'], 'Wrong build number')
         require(info.get('ITSAppUsesNonExemptEncryption') is False, 'Unexpected encryption declaration')
         require('NSMicrophoneUsageDescription' not in info, 'Unexpected microphone permission')
-        require('audio' not in info.get('UIBackgroundModes', []), 'Unexpected background audio mode')
+        require('audio' in info.get('UIBackgroundModes', []), 'Missing background audio mode')
         require((app / 'main.jsbundle').is_file(), 'Missing production JavaScript bundle')
         run('codesign', '--verify', '--deep', '--strict', str(app))
         entitlement_bytes = run('codesign', '--display', '--entitlements', ':-', str(app))
@@ -58,6 +58,7 @@ def verify(ipa):
         receipt = {'file': ipa.name, 'sha256': hashlib.sha256(ipa.read_bytes()).hexdigest(),
                    'version': info['CFBundleShortVersionString'], 'build': info['CFBundleVersion'],
                    'bundle': PACKAGE, 'team': TEAM, 'audioFilesVerified': len(sources),
+                   'backgroundAudio': True,
                    'profileExpires': profile['ExpirationDate'].isoformat()}
         ipa.with_suffix('.verified.json').write_text(json.dumps(receipt, indent=2) + '\n')
         print(json.dumps(receipt, indent=2))

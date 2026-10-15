@@ -1,4 +1,4 @@
-"""Validate the actual release bundle before allowing an internal upload."""
+"""Validate the actual release bundle before allowing a store upload."""
 import hashlib
 import json
 import os
@@ -22,6 +22,17 @@ def require(condition, message):
         raise ValueError(message)
 
 
+def verify_background_audio(application, permissions):
+    for permission in ('FOREGROUND_SERVICE', 'FOREGROUND_SERVICE_MEDIA_PLAYBACK', 'WAKE_LOCK'):
+        require(f'android.permission.{permission}' in permissions, f'Missing background audio permission: {permission}')
+    services = [service for service in application.findall('service') if 'mediaPlayback' in service.get(ANDROID + 'foregroundServiceType', '').split('|')]
+    require(len(services) == 1, 'Expected one background audio service owner')
+    service = services[0]
+    require(service.get(ANDROID + 'name') == 'expo.modules.audio.service.AudioControlsService', 'Wrong background audio service')
+    require(service.get(ANDROID + 'exported') == 'false', 'Background audio service must not be exported')
+    require(any(action.get(ANDROID + 'name') == 'androidx.media3.session.MediaSessionService' for action in service.findall('intent-filter/action')), 'Missing media session service intent')
+
+
 def verify(bundle):
     config = json.loads((ROOT / "app.json").read_text())["expo"]
     tool = Path(os.environ["BUNDLETOOL_JAR"]).resolve()
@@ -37,6 +48,7 @@ def verify(bundle):
         require(blocked not in permissions, f"Unexpected permission: {blocked}")
     require("android.permission.SCHEDULE_EXACT_ALARM" in permissions, "Missing exact alarm permission")
     require(any(e.get(ANDROID + "name", "").endswith("RestoreFocusReceiver") for e in application.findall("receiver")), "Missing DND restoration receiver")
+    verify_background_audio(application, permissions)
 
     signature = run("jarsigner", "-J-Duser.language=en", "-verify", str(bundle))
     require("jar verified." in signature, "Bundle signature could not be verified")
@@ -67,7 +79,9 @@ def verify(bundle):
     resources = run("java", "-jar", str(tool), "dump", "resources", f"--bundle={bundle}", "--resource=color/splashscreen_background", "--values")
     colors = set(re.findall(r"\[COLOR_\w+\]\s+#([0-9a-f]+)", resources.lower(), re.IGNORECASE))
     require(bool(colors) and colors <= {"181613", "ff181613"}, "Wrong splash background")
-    print(json.dumps({"bundle": str(bundle), "version": config["version"], "versionCode": config["android"]["versionCode"], "sha256": hashlib.sha256(bundle.read_bytes()).hexdigest(), "signingSha256": fingerprint, "verified": True}, indent=2))
+    receipt = {"bundle": bundle.name, "version": config["version"], "versionCode": config["android"]["versionCode"], "sha256": hashlib.sha256(bundle.read_bytes()).hexdigest(), "signingSha256": fingerprint, "backgroundAudioVerified": True, "verified": True}
+    bundle.with_suffix('.verified.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    print(json.dumps(receipt, indent=2))
 
 
 if __name__ == "__main__":
