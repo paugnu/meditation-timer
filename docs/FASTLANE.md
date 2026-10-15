@@ -1,8 +1,9 @@
 # Compilaciones con Fastlane
 
-Fastlane compila un AAB firmado y lo verifica antes de permitir una subida al canal
-interno de Google Play. No usa EAS Build ni modifica el canal de producción. iOS se compila en macOS
-con GitHub Actions y se sube a TestFlight por API.
+Fastlane compila paquetes firmados y los verifica antes de subirlos. Los flujos manuales de
+GitHub Actions compilan Android en Ubuntu e iOS en macOS, sin EAS Build. La entrada
+`publish=true` permite el envío público: producción de Google Play o App Review con publicación
+automática tras aprobación. Sin esa entrada, Android solo compila e iOS llega hasta TestFlight.
 
 ## Preparación
 
@@ -16,7 +17,7 @@ con GitHub Actions y se sube a TestFlight por API.
   `keystorePath`, `keystorePassword`, `keyAlias` y `keyPassword`). Las rutas relativas
   del keystore se resuelven desde la carpeta del JSON. Reutilizar la firma existente.
 - Un JSON de cuenta de servicio con acceso a esta app en Google Play para consultar
-  versiones y subir al canal interno. No hace falta para compilar.
+  versiones y subir a los canales interno y producción. No hace falta para compilar.
 
 Los archivos de claves, `credentials.json`, `secrets/`, dependencias locales y
 resultados de compilación están excluidos de Git. Mantener permisos privados en las claves.
@@ -73,7 +74,31 @@ sin cambiar textos, capturas ni imágenes de la ficha. No inicia otra compilaci�
 Una carga correcta no demuestra que el paquete esté disponible: confirmar el código
 en el canal interno con `status` y registrar el resultado en `store/RELEASE-STATUS.md`.
 
-## iOS: GitHub Actions → TestFlight
+## Android: GitHub Actions → Google Play
+
+El flujo `.github/workflows/android-release.yml` usa Ubuntu 24.04, JDK 17, Node 22 y Ruby 3.3,
+con una sola ejecución simultánea en `main`. Instala las herramientas del SDK necesarias
+y verifica el SHA-256 de bundletool antes de usarlo. Las claves existentes se guardan como:
+
+- `ANDROID_KEYSTORE_BASE64`: keystore de subida existente en base64.
+- `ANDROID_CREDENTIALS_JSON`: JSON con `android.keystore`, alias y contraseñas. El restaurador
+  reemplaza cualquier ruta local por la ruta temporal del keystore en el ejecutor.
+- `GOOGLE_PLAY_JSON_KEY`: contenido JSON de la cuenta de servicio con acceso a la app.
+
+Los secretos se restauran solo en `RUNNER_TEMP/android-signing`, con archivos privados,
+y se eliminan incluso si falla un paso. El flujo verifica firma, versión, permisos bloqueados,
+sonidos, mapping, splash y servicio multimedia del AAB real. Conserva AAB y recibo durante siete días.
+
+```bash
+gh workflow run android-release.yml --ref main -f publish=true
+```
+
+Con `publish=true`, `fastlane android publish` envía el AAB a producción con lanzamiento
+completo y `changes_not_sent_for_review=false`. No convierte silenciosamente un fallo de revisión
+en un borrador. Conserva textos e imágenes de la ficha y añade las novedades en español.
+Confirmar después el código en Google Play y distinguir envío aceptado de aprobación/disponibilidad.
+
+## iOS: GitHub Actions → TestFlight y App Store
 
 El flujo `.github/workflows/ios-testflight.yml` se ejecuta manualmente en `main`,
 con un máximo de 60 minutos y una sola ejecución simultánea. Usa el ejecutor
@@ -94,12 +119,12 @@ las credenciales si falla un paso. No se exportan secretos como artefactos.
 
 Antes de lanzar el flujo, consultar App Store Connect, asignar una versión válida y
 un `ios.buildNumber` no usado en `app.json`, verificar los cambios y subirlos a `main`.
-En GitHub: **Actions → iOS TestFlight → Run workflow → main**.
+En GitHub: **Actions → iOS TestFlight and App Store → Run workflow → main**.
 
 El flujo ejecuta typecheck y pruebas unitarias, genera iOS, instala CocoaPods,
 compila y verifica el IPA real: firma, identificador y equipo, versión, perfil App
 Store vigente, ausencia de firma debug y permiso de micrófono, JavaScript de
-producción, y hashes del gong y los ocho ambientes. Guarda el IPA y un recibo con
+producción, capacidad de audio en segundo plano y hashes del gong y los ocho ambientes. Guarda el IPA y un recibo con
 SHA-256 durante siete días. Después lo sube y espera hasta 15 minutos al procesado
 por Apple. Si esa espera expira, consultar Apple antes de repetir una subida.
 Una compilación válida no sustituye las pruebas físicas en iPhone.
@@ -119,3 +144,15 @@ La carpeta de firma contiene `ios-distribution.p12`, `ios-certificate-password.t
 y `ios.mobileprovision`. La tarea `internal` no envía la versión a App Review ni
 publica en App Store. Confirmar el procesado y acceso del grupo interno en Apple,
 y añadir el resultado a `store/RELEASE-STATUS.md`.
+
+Para publicar una nueva versión con autorización del usuario:
+
+```bash
+gh workflow run ios-testflight.yml --ref main -f publish=true
+```
+
+Después de que Apple procese el IPA, `fastlane ios publish` selecciona el número de build
+de `app.json`, conserva la ficha y las capturas heredadas, actualiza solo las novedades y envía
+a App Review con `AFTER_APPROVAL`. Rechaza una versión editable diferente para evitar renombrarla.
+`WAITING_FOR_REVIEW` o `IN_REVIEW` significa enviada, no publicada; verificar la versión, build
+y modo de publicación en App Store Connect y registrar el resultado.

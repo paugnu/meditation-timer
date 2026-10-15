@@ -22,10 +22,22 @@ def require(condition, message):
         raise ValueError(message)
 
 
+def has_media_playback_type(value):
+    if not value:
+        return False
+    if re.fullmatch(r'(?:0[xX][0-9a-fA-F]+|[0-9]+)', value):
+        # bundletool renders compiled foreground-service flags as hexadecimal.
+        mask = int(value, 16 if value.lower().startswith('0x') else 10)
+        require(mask <= 0xffffffff, 'Invalid foreground service type mask')
+        return bool(mask & 0x2)
+    require(re.fullmatch(r'[a-zA-Z][a-zA-Z0-9]*(?:\|[a-zA-Z][a-zA-Z0-9]*)*', value), 'Malformed foreground service type')
+    return 'mediaPlayback' in value.split('|')
+
+
 def verify_background_audio(application, permissions):
     for permission in ('FOREGROUND_SERVICE', 'FOREGROUND_SERVICE_MEDIA_PLAYBACK', 'WAKE_LOCK'):
         require(f'android.permission.{permission}' in permissions, f'Missing background audio permission: {permission}')
-    services = [service for service in application.findall('service') if 'mediaPlayback' in service.get(ANDROID + 'foregroundServiceType', '').split('|')]
+    services = [service for service in application.findall('service') if has_media_playback_type(service.get(ANDROID + 'foregroundServiceType', ''))]
     require(len(services) == 1, 'Expected one background audio service owner')
     service = services[0]
     require(service.get(ANDROID + 'name') == 'expo.modules.audio.service.AudioControlsService', 'Wrong background audio service')
