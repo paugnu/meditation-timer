@@ -420,3 +420,10 @@ Pendiente y no hecho aquí:
 - Publicación automática configurada: `releaseType: AFTER_APPROVAL`.
   **Todavía no aprobada ni publicada:** pendiente de revisión de Apple.
   No se ha generado otra compilación ni modificado la publicación de Android.
+
+## 2026-10-15 — Audio en segundo plano preparado en el código
+
+- Corregido el corte del ambiente al cambiar de aplicación: configuración de audio compartida y módulo nativo para fundidos, espera inicial y parada por fecha límite. Incluye servicio multimedia en Android y capacidad de audio en segundo plano en iOS.
+- TypeScript, 32 pruebas unitarias, 47 escenarios web, compilación Android de desarrollo y exportación del bundle iOS verificados. Swift y reproducción física pendientes de comprobar en una nueva build instalada; detalles en `docs/VALIDATION.md`.
+- Seis grabaciones auditadas, sin sustituciones: tormenta 14:19, viento 1:39 y campanas 2:15. Pájaros y tanpura intactos. Informe en `docs/AMBIENCE-AUDIT.md`.
+- No se ha generado un AAB/IPA de distribución ni enviado nada a Google Play, TestFlight o App Review. La versión instalada no recibe este cambio todavía. Antes de una próxima subida, incrementar los números de versión/build que corresponda; `app.json` conserva los de la última entrega.

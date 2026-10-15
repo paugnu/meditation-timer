@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppState, Platform } from 'react-native';
-import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
+import { useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { defaults, restoreSettings, Settings } from '../settings';
 import { idleTimer, remaining, restoreTimer, TimerState, transition } from '../timer';
@@ -9,6 +9,7 @@ import { cancelAlert, prepareAlerts, scheduleAlert } from '../services/alerts';
 import { focus } from '../services/focus';
 import { ActiveSession, MeditationRecord, finishSession, newSession, restoreActiveSession, restoreHistory } from '../history';
 import { ambienceLeadMs } from '../ambience';
+import { configureAudio } from '../services/audio';
 
 export function useMeditation() {
   const [sessionSequence, setSessionSequence] = useState(0);
@@ -24,6 +25,8 @@ export function useMeditation() {
   const finishRequestedAt = useRef<number | null>(null);
   const [notice, setNotice] = useState('');
   const [ambienceHold, setAmbienceHold] = useState(0);
+  // A restored countdown does not authorize audio; app switches preserve this in-memory intent.
+  const [ambienceAllowed, setAmbienceAllowed] = useState(false);
   const state = useRef(timer);
   const prefs = useRef(settings);
   const lock = useRef(false);
@@ -41,7 +44,7 @@ export function useMeditation() {
   };
   const playGong = async () => {
     try {
-      await setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' });
+      await configureAudio();
       const deadline = Date.now() + 5000;
       while (!player.isLoaded) {
         if (!mounted.current || Date.now() >= deadline) throw new Error('Gong loading timed out');
@@ -158,6 +161,7 @@ export function useMeditation() {
       try { await scheduleAlert(next.endsAt!, prefs.current); }
       catch { setNotice('No se ha podido programar el aviso. Mantén la app abierta para escuchar el gong.'); }
     }
+    setAmbienceAllowed(true);
     setNow(Date.now()); save(next);
     // A gong that never sounds must not keep the ambience waiting for it.
     if (opensWithGong && !(await playGong())) setAmbienceHold(0);
@@ -207,8 +211,9 @@ export function useMeditation() {
   const updateSettings = (patch: Partial<Settings>) => {
     const next = restoreSettings({ ...prefs.current, ...patch });
     const current = state.current;
+    if (patch.ambience !== undefined && current.status === 'running') setAmbienceAllowed(true);
     save(current.status === 'idle' || current.status === 'completed' ? idleTimer(next.minutes) : current, next);
   };
-  return { settings, timer, history, ready, busy, notice, notify: setNotice, ambienceHold, sessionSequence, deleteRecord, clearNotice: () => setNotice(''), updateSettings, start, pause, requestFinish, resolveFinish, cancelFinish, confirmFinish, playGong,
+  return { settings, timer, history, ready, busy, notice, notify: setNotice, ambienceHold, ambienceAllowed, sessionSequence, deleteRecord, clearNotice: () => setNotice(''), updateSettings, start, pause, requestFinish, resolveFinish, cancelFinish, confirmFinish, playGong,
     remainingMs: remaining(timer, now) };
 }

@@ -62,7 +62,7 @@ function MeditationScreen({ fontsReady }: { fontsReady: boolean }) {
     onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.5,
     onPanResponderRelease: (_, gesture) => { if (gesture.dx <= -36) cycle.current(1); else if (gesture.dx >= 36) cycle.current(-1); },
   })).current;
-  useAmbience(settings.ambience, active, settings.volume, meditation.ambienceHold, meditation.notify);
+  useAmbience(settings.ambience, active && meditation.ambienceAllowed, settings.volume, meditation.ambienceHold, timer.endsAt, t(ambienceLabels[settings.ambience]), meditation.notify);
   const wide = height < 560 && width > height;
   // Measure inside the safe area and reserve the controls before sizing the halo.
   const haloSpace = viewportHeight && panelHeight ? Math.floor(viewportHeight - panelHeight - 36) : height;

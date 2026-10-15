@@ -1,0 +1,20 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+group = 'expo.modules.meditationaudio'
+version = '1.0.0'
+android {
+  namespace 'expo.modules.meditationaudio'
+  defaultConfig {
+    versionCode 1
+    versionName '1.0.0'
+  }
+}
+dependencies {
+  // SDK 57 normally autolinks Expo Audio as a prebuilt Maven artifact.
+  def audioProject = findProject(':expo-audio')
+  def audioVersion = new groovy.json.JsonSlurper().parse(file('../../../node_modules/expo-audio/package.json')).version
+  implementation audioProject ?: "expo.modules.audio:expo.modules.audio:$audioVersion"
+  implementation 'androidx.media3:media3-exoplayer:1.9.0'
+}

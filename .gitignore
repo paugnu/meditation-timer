@@ -40,6 +40,7 @@ yarn-error.*
 /ios
 /android
 /modules/meditation-focus/android/build/
+/modules/meditation-audio/android/build/
 
 # Test artifacts
 /test-results/

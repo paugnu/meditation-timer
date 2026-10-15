@@ -35,7 +35,10 @@ Identificador en ambas plataformas: `com.pau.meditationtimer`.
   Solo suena mientras el temporizador corre: elegirlo en reposo no reproduce nada, y pausar
   o terminar lo desvanece. Cambiar de ambiente hace fundido cruzado, nunca un corte.
   Comparte el volumen del gong, así que un único deslizador gobierna todo lo que suena.
-  Al salir de la app el sistema lo detiene; al volver reaparece con un fundido de entrada.
+  Continúa al cambiar a otra app o bloquear la pantalla. Los fundidos y la parada al llegar
+  a cero se ejecutan también de forma nativa, sin depender de JavaScript en segundo plano.
+  En Android aparece el control multimedia del ambiente; pausa/reanuda solo ese sonido,
+  mientras el temporizador sigue contando. Pausar la meditación retira ese control.
 - El gong y el fondo se turnan: con gong de inicio, el ambiente espera y entra bajo su cola;
   al terminar, el ambiente se retira mientras el gong suena. El retardo se calcula desde la
   duración real del gong, no de una constante.
@@ -103,7 +106,7 @@ Para compilar Android y subirlo a pruebas internas sin EAS Build, ver
 ```bash
 npm run typecheck
 npm test          # 32 pruebas de lógica (node:test vía tsx)
-npm run test:e2e  # 43 escenarios Playwright sobre la vista web; necesita Google Chrome
+npm run test:e2e  # 47 escenarios Playwright sobre la vista web; necesita Google Chrome
 npx expo-doctor
 npx expo export --platform all
 npx expo prebuild --no-install
@@ -167,6 +170,7 @@ src/hooks/useAmbience.ts     Motor de fundido cruzado del sonido de fondo
 src/components/              ClockFace (halo), SettingsPanel, HistoryPanel, HistoryCalendar, Icon
 src/services/                storage (AsyncStorage), alerts (notificaciones), focus, reviews
 modules/meditation-focus/    Módulo Expo local en Kotlin para No molestar (Android)
+modules/meditation-audio/    Fundidos y parada por fecha límite en Kotlin/Swift
 assets/gong.wav              «Meditation Gong» de Marble Toast (CC0); licencia en gong-LICENSE.md
 assets/ambience/             Grabaciones seleccionadas y bucles; fuentes en ambience/LICENSE.md
 scripts/                     Generadores de ambientes, gong e iconos, y capturas de tienda
@@ -185,6 +189,8 @@ con unión cruzada y volumen equilibrado. Seis grabaciones usan la licencia de P
 fuentes, tratamiento y comprobaciones en [assets/ambience/LICENSE.md](assets/ambience/LICENSE.md).
 La continuidad de la reproducción nativa debe verificarse también en iPhone y Android;
 las comprobaciones de archivos no sustituyen esa prueba.
+El análisis de duración, repeticiones y archivos distribuidos está en
+[docs/AMBIENCE-AUDIT.md](docs/AMBIENCE-AUDIT.md).
 
 El diseño de la pantalla principal partió de una revisión de la ficha pública y las seis capturas de
 [Meditation Timer de Telesense](https://play.google.com/store/apps/details?id=uk.co.telesense.tm.free&hl=en);

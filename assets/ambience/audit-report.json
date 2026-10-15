@@ -1,0 +1,201 @@
+{
+  "method": {
+    "reviewed": [
+      "rain",
+      "waves",
+      "wind",
+      "storm",
+      "chimes",
+      "brown"
+    ],
+    "excluded_by_request": [
+      "birds",
+      "tanpura"
+    ],
+    "waveform": "Normalized autocorrelation of 2 kHz mono audio; lags from 5 s to half the recording.",
+    "excerpts": "Five log-power bands from 20\u20131000 Hz, 100 ms frames; 10 s windows at 1 s intervals, separated by >20 s. Per-band whole-track standardization and per-window centering. Strongest candidate also compared by waveform with \u00b11 s alignment.",
+    "limits": "Numerical screening, not a listening test. Tonal ringing/natural swells can correlate without copied audio. These measurements cannot establish subjective repetitiveness or native gapless playback."
+  },
+  "sounds": {
+    "rain": {
+      "sha256": "3dbd745586447f7db7b3c9d9244b5d06f6bfa59a41d064ba688c98619c00354a",
+      "matches_preparation_report": true,
+      "seconds": 508.6098866213152,
+      "decoded_samples": 22429696,
+      "sample_rate": 44100,
+      "channels": 2,
+      "decoded_samples_match_prepared_pcm": true,
+      "peak_dbfs": -2.181938648223877,
+      "rms_dbfs": -26.680444426270107,
+      "boundary_step_ratio_to_p99": [
+        0.0015629585832357407,
+        0.026279266923666
+      ],
+      "edge_rms_db": [
+        -29.53922960647222,
+        -28.892336258905345
+      ],
+      "cycles_per_30_minutes": 3.539058219959825,
+      "repetition": {
+        "whole_track_peak_correlation": 0.008103229798042417,
+        "whole_track_peak_lag_seconds": 243.393,
+        "most_similar_10s_spectral_dynamics": 0.2981778125621081,
+        "excerpt_start_seconds": [
+          226,
+          404
+        ],
+        "excerpt_waveform_peak_correlation_within_1s": 0.03700333658853716
+      }
+    },
+    "waves": {
+      "sha256": "6fe31398f755eb372bd2ad9ad25ba6035043fb254ec3f7e062ea68ab17d05316",
+      "matches_preparation_report": true,
+      "seconds": 697.4345578231292,
+      "decoded_samples": 30756864,
+      "sample_rate": 44100,
+      "channels": 2,
+      "decoded_samples_match_prepared_pcm": true,
+      "peak_dbfs": -5.878512382507324,
+      "rms_dbfs": -26.054162930040498,
+      "boundary_step_ratio_to_p99": [
+        0.31013360619544983,
+        0.11807306110858917
+      ],
+      "edge_rms_db": [
+        -31.80314472713981,
+        -30.972090798297486
+      ],
+      "cycles_per_30_minutes": 2.5808873102277268,
+      "repetition": {
+        "whole_track_peak_correlation": 0.01963498506306272,
+        "whole_track_peak_lag_seconds": 333.6255,
+        "most_similar_10s_spectral_dynamics": 0.6992112321738713,
+        "excerpt_start_seconds": [
+          49,
+          272
+        ],
+        "excerpt_waveform_peak_correlation_within_1s": 0.07282728413617177
+      }
+    },
+    "wind": {
+      "sha256": "8b1d49f2c035b0ec8a209e60c581402cdd4cc62b0d3cc39ff80bb7e7290fc23c",
+      "matches_preparation_report": true,
+      "seconds": 98.6615873015873,
+      "decoded_samples": 4350976,
+      "sample_rate": 44100,
+      "channels": 2,
+      "decoded_samples_match_prepared_pcm": true,
+      "peak_dbfs": -6.1417412757873535,
+      "rms_dbfs": -26.216036375262025,
+      "boundary_step_ratio_to_p99": [
+        0.0770493745803833,
+        0.003799844766035676
+      ],
+      "edge_rms_db": [
+        -28.600156647424694,
+        -23.623902635639446
+      ],
+      "cycles_per_30_minutes": 18.24418245469522,
+      "repetition": {
+        "whole_track_peak_correlation": 0.06194925833216421,
+        "whole_track_peak_lag_seconds": 13.909,
+        "most_similar_10s_spectral_dynamics": 0.36441719778040615,
+        "excerpt_start_seconds": [
+          54,
+          88
+        ],
+        "excerpt_waveform_peak_correlation_within_1s": 0.03572472291908
+      }
+    },
+    "storm": {
+      "sha256": "15fcaf8019ec1f8b1c231a005d536f92dd8541a6fc5928ed9ae9a95ce420eb00",
+      "matches_preparation_report": true,
+      "seconds": 859.1615419501134,
+      "decoded_samples": 37889024,
+      "sample_rate": 44100,
+      "channels": 2,
+      "decoded_samples_match_prepared_pcm": true,
+      "peak_dbfs": -5.6503190994262695,
+      "rms_dbfs": -27.1217523062367,
+      "boundary_step_ratio_to_p99": [
+        0.13276663422584534,
+        0.20332370698451996
+      ],
+      "edge_rms_db": [
+        -32.597503818622904,
+        -32.61646924337547
+      ],
+      "cycles_per_30_minutes": 2.095065842815059,
+      "repetition": {
+        "whole_track_peak_correlation": 0.01700084193952363,
+        "whole_track_peak_lag_seconds": 222.5415,
+        "most_similar_10s_spectral_dynamics": 0.7545371909283937,
+        "excerpt_start_seconds": [
+          45,
+          181
+        ],
+        "excerpt_waveform_peak_correlation_within_1s": 0.07872671148611785
+      }
+    },
+    "chimes": {
+      "sha256": "9282b38511ea403514124b82a7247f77d76696f8f8de80c962b1969e25fa9453",
+      "matches_preparation_report": true,
+      "seconds": 134.67573696145124,
+      "decoded_samples": 5939200,
+      "sample_rate": 44100,
+      "channels": 2,
+      "decoded_samples_match_prepared_pcm": true,
+      "peak_dbfs": -7.597860336303711,
+      "rms_dbfs": -26.04795964414499,
+      "boundary_step_ratio_to_p99": [
+        0.2847847044467926,
+        0.3464553952217102
+      ],
+      "edge_rms_db": [
+        -31.656362312311927,
+        -32.35605692537816
+      ],
+      "cycles_per_30_minutes": 13.365436422413794,
+      "repetition": {
+        "whole_track_peak_correlation": 0.14183450104818113,
+        "whole_track_peak_lag_seconds": 55.084,
+        "most_similar_10s_spectral_dynamics": 0.4373411878269645,
+        "excerpt_start_seconds": [
+          65,
+          98
+        ],
+        "excerpt_waveform_peak_correlation_within_1s": 0.5186369723234803
+      }
+    },
+    "brown": {
+      "sha256": "d46869e7ecd45ca37eb3b272b22933a56f125f7577f6ec1324575db4e27ea8ed",
+      "matches_preparation_report": true,
+      "seconds": 578.0143310657596,
+      "decoded_samples": 25490432,
+      "sample_rate": 44100,
+      "channels": 2,
+      "decoded_samples_match_prepared_pcm": true,
+      "peak_dbfs": -11.28419303894043,
+      "rms_dbfs": -26.010463578256903,
+      "boundary_step_ratio_to_p99": [
+        0.0817447304725647,
+        0.1290586143732071
+      ],
+      "edge_rms_db": [
+        -26.128660365980913,
+        -25.877688983089243
+      ],
+      "cycles_per_30_minutes": 3.1141096392560157,
+      "repetition": {
+        "whole_track_peak_correlation": 0.015222080689832858,
+        "whole_track_peak_lag_seconds": 274.0095,
+        "most_similar_10s_spectral_dynamics": 0.1881711875758688,
+        "excerpt_start_seconds": [
+          53,
+          237
+        ],
+        "excerpt_waveform_peak_correlation_within_1s": 0.07043466486638618
+      }
+    }
+  }
+}

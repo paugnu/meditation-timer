@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { AppState } from 'react-native';
-import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { AppState, Platform } from 'react-native';
+import { AudioPlayer, createAudioPlayer } from 'expo-audio';
 import { AmbienceId } from '../ambience';
+import { configureAudio } from '../services/audio';
+import { ambienceNative } from '../services/ambienceNative';
 
 const sources: Partial<Record<AmbienceId, number>> = {
   rain: require('../../assets/ambience/rain.m4a'),
@@ -25,21 +27,27 @@ const FADE_MS = 1500, STEP_MS = 50;
  * which makes a switch a pure volume ramp. Silence is a destination like any other, which is
  * what lets 'none' fade instead of cut.
  */
-export function useAmbience(id: AmbienceId, running: boolean, volume: number, holdUntil: number, onError: (message: string) => void) {
+export function useAmbience(id: AmbienceId, running: boolean, volume: number, holdUntil: number, endsAt: number | null, title: string, onError: (message: string) => void) {
   const players = useRef(new Map<string, AudioPlayer>());
   const levels = useRef(new Map<string, number>());
   const pending = useRef(new Set<ReturnType<typeof setTimeout>>());
   const goal = useRef<AmbienceId | null>(null);
   const ticker = useRef<ReturnType<typeof setInterval> | null>(null);
-  const configured = useRef(false);
+  const nativeGoal = useRef<AmbienceId | null>(null);
+  const nativeDeadline = useRef<number | null>(null);
+  const lockScreen = useRef<AudioPlayer | null>(null);
+  const foregroundOnly = Platform.OS !== 'web' && !ambienceNative;
   const [foreground, setForeground] = useState(AppState.currentState === 'active');
   const [, bump] = useState(0);
   const wasForeground = useRef(foreground);
   const level = useRef(volume);
   level.current = volume;
+  const deadline = useRef(endsAt);
+  deadline.current = endsAt;
 
   // Reads refs only, so this closure is created once and stays valid for the component's life.
   const settle = useRef(() => {
+    if (deadline.current !== null && Date.now() >= deadline.current) goal.current = null;
     let moving = false;
     for (const [key, player] of players.current) {
       const target = key === goal.current ? level.current : 0;
@@ -72,6 +80,7 @@ export function useAmbience(id: AmbienceId, running: boolean, volume: number, ho
   // render, not stored: set from an effect it would still be stale on the commit that starts
   // the session, and the ambience would slip in before the gong.
   const released = holdUntil <= Date.now();
+  const expired = endsAt !== null && endsAt <= Date.now();
   useEffect(() => {
     const wait = holdUntil - Date.now();
     if (wait <= 0) return;
@@ -80,19 +89,73 @@ export function useAmbience(id: AmbienceId, running: boolean, volume: number, ho
   }, [holdUntil]);
 
   useEffect(() => {
-    const listener = AppState.addEventListener('change', value => setForeground(value === 'active'));
+    if (!running || endsAt === null) return;
+    const timer = setTimeout(() => bump(value => value + 1), Math.max(0, endsAt - Date.now()));
+    return () => clearTimeout(timer);
+  }, [running, endsAt]);
+
+  useEffect(() => {
+    // Only Expo Go/old binaries fall back to foreground audio. Installed builds use native ramps.
+    const listener = foregroundOnly ? AppState.addEventListener('change', value => setForeground(value === 'active')) : null;
     return () => {
-      listener.remove();
+      listener?.remove();
       if (ticker.current) { clearInterval(ticker.current); ticker.current = null; }
       for (const later of pending.current) clearTimeout(later);
       pending.current.clear();
-      for (const player of players.current.values()) { try { player.remove(); } catch { /* already gone */ } }
+      try { lockScreen.current?.setActiveForLockScreen(false); } catch { /* already gone */ }
+      for (const player of players.current.values()) {
+        const remove = () => { try { player.remove(); } catch { /* already gone */ } };
+        if (ambienceNative) void ambienceNative.remove(player).then(remove, remove);
+        else remove();
+      }
       players.current.clear(); levels.current.clear();
     };
   }, []);
 
   useEffect(() => {
-    const wanted: AmbienceId | null = running && foreground && released && id !== 'none' ? id : null;
+    if (!ambienceNative) return;
+    const engine = ambienceNative;
+    let cancelled = false;
+    const wanted = running && !expired && endsAt !== null && volume > 0 && id !== 'none' ? id : null;
+    void (async () => {
+      await configureAudio();
+      if (cancelled) return;
+      if (wanted && !players.current.has(wanted)) {
+        const player = createAudioPlayer(sources[wanted]!);
+        player.loop = true; player.volume = 0;
+        player.addListener('playbackStatusUpdate', status => {
+          if (status.error) onError('No se ha podido reproducir el sonido de fondo.');
+        });
+        players.current.set(wanted, player);
+      }
+      const nextPlayer = wanted ? players.current.get(wanted)! : null;
+      // Android needs one active media service. Release the outgoing owner before handing over.
+      if (Platform.OS === 'android' && lockScreen.current !== nextPlayer) {
+        lockScreen.current?.setActiveForLockScreen(false);
+        lockScreen.current = null;
+      }
+      for (const [key, player] of players.current) {
+        await engine.setTarget(player, key === wanted ? volume : 0, key === wanted ? holdUntil : 0, key === wanted ? endsAt : null);
+        if (cancelled) return;
+      }
+      if (Platform.OS === 'android' && nextPlayer && lockScreen.current !== nextPlayer && endsAt! > Date.now()) {
+        nextPlayer.setActiveForLockScreen(true, { title, artist: 'Meditation Timer · YogaBond' }, { showSeekBackward: false, showSeekForward: false });
+        lockScreen.current = nextPlayer;
+      }
+      if (nextPlayer && (nativeGoal.current !== wanted || nativeDeadline.current !== endsAt) && endsAt! > Date.now()) {
+        // Start muted even during the opening gong: native code releases the hold and fades in
+        // without JS timers, then stops at the absolute deadline even if JS is suspended.
+        nextPlayer.play();
+      }
+      nativeGoal.current = wanted;
+      nativeDeadline.current = wanted ? endsAt : null;
+    })().catch(() => { if (!cancelled) onError('No se ha podido reproducir el sonido de fondo.'); });
+    return () => { cancelled = true; };
+  }, [id, running, volume, holdUntil, endsAt, expired, title, onError]);
+
+  useEffect(() => {
+    if (ambienceNative) return;
+    const wanted: AmbienceId | null = running && !expired && (!foregroundOnly || foreground) && released && id !== 'none' ? id : null;
     goal.current = wanted;
     const returned = foreground && !wasForeground.current;
     wasForeground.current = foreground;
@@ -110,14 +173,10 @@ export function useAmbience(id: AmbienceId, running: boolean, volume: number, ho
         // no longer matches reality. Come back from silence and fade in again.
         const existing = players.current.get(wanted);
         if (returned && existing) { levels.current.set(wanted, 0); try { existing.volume = 0; } catch { /* gone */ } }
-        if (!configured.current) {
-          configured.current = true;
-          // Mix rather than duck: the gong has to ring over the ambience, not replace it.
-          void setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' }).catch(() => {});
-        }
+        void configureAudio().catch(() => onError('No se ha podido reproducir el sonido de fondo.'));
       } catch { onError('No se ha podido reproducir el sonido de fondo.'); return; }
     }
     if (!ticker.current) ticker.current = setInterval(settle, STEP_MS);
     settle();
-  }, [id, running, volume, foreground, released, onError, settle]);
+  }, [id, running, volume, foreground, foregroundOnly, released, expired, onError, settle]);
 }

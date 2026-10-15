@@ -53,9 +53,14 @@ the tested ones), all effects and orchestration in `src/hooks/useMeditation.ts`,
   `pause()` of a finished fade is deferred past it — pausing a `play()` that has not landed yet
   rejects it, which is what stepping quickly through the list used to do. Two e2e tests pin all of
   this, including the exact number of playback starts. It shares `settings.volume` with the gong,
-  and a volume of zero must stay silent. Backgrounding freezes the ramp while the system stops
-  playback, so the stored level goes stale: returning to the app resets that track to zero and
-  fades it in again rather than trusting the level it left behind. The gong and the ambience take
+  and a volume of zero must stay silent. Installed builds keep playing across app switches and
+  screen lock: `modules/meditation-audio` owns native fades, the opening hold and the absolute
+  deadline stop, independently of JS. Android uses one media-service owner and a playback wake lock;
+  its system controls pause/resume only the labelled ambience, never the timer. Pause/finish remove
+  those controls, and native guards reject stale play commands after expiry. Web uses the JS fade
+  engine; Expo Go/old binaries without this module retain a foreground-only fallback.
+  The gong and the ambience share `configureAudio()` so neither disables background playback.
+  The gong and the ambience take
   turns: an opening gong holds the ambience back (`ambienceLeadMs`, derived from the gong's real
   duration) so it swells out of the decay, and completion drops the ambience as the closing gong
   rings. That hold is computed during render — set from an effect it is still stale on the commit
@@ -83,7 +88,7 @@ the tested ones), all effects and orchestration in `src/hooks/useMeditation.ts`,
   changes with verification, commit and push to `origin/main`; confirm the working tree is clean and
   local and remote commits match. Do not leave completed changes only on this machine.
 - Verify with `npm run typecheck && npm test` (32 unit tests, node:test via tsx) and, for UI changes,
-  `npm run test:e2e` (42 Playwright scenarios against the web build; needs Chrome). Occasional startup
+  `npm run test:e2e` (47 Playwright scenarios against the web build; needs Chrome). Occasional startup
   flake under full parallelism passes on a serial rerun.
 - Style is deliberately dense: compact modules, inline JSX styling, comments only where an invariant is
   non-obvious. Match it rather than reformatting.
