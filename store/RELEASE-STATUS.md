@@ -497,3 +497,16 @@ Pendiente y no hecho aquí:
 - **No se confirma aprobación ni disponibilidad pública en ninguna tienda.** iOS sigue enviado
   a App Review con publicación automática. El emulador y sus servicios temporales se han cerrado,
   conservando la grabación y las evidencias; no se han modificado los dispositivos ni el audio del usuario.
+
+## 2026-10-15 — Android publicada; iOS pendiente de revisión
+
+- El usuario confirma «Funciona perfecta» y solicita publicar en producción. Se conserva la
+  compilación 1.6.0 (17) ya enviada, sin generar otra build ni reiniciar las revisiones.
+- Comprobación a las 12:08 UTC (14:08 en Madrid): Google Play Console confirma «Se ha publicado
+  la actualización de la aplicación», con última publicación el 15 de octubre de 2026 y sin
+  cambios pendientes en el resumen de publicación. La API confirma código `17` en `production`
+  y `16` en interno. **Android 1.6.0 (17) publicada en producción**, con lanzamiento completo;
+  Google advierte que la visibilidad de los cambios puede tardar en propagarse.
+- App Store Connect mantiene iOS 1.6.0 en `WAITING_FOR_REVIEW`, con `releaseType: AFTER_APPROVAL`.
+  **iOS todavía no publicada**: se publicará automáticamente cuando Apple la apruebe, sin un
+  nuevo envío ni una liberación manual por nuestra parte.

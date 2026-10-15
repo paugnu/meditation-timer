@@ -161,3 +161,7 @@ Cada sesión de la lista diaria ofrece Eliminar registro, con confirmación en l
 - Sesión de un minuto con «Lluvia suave»: elegir ambiente en reposo permanece en silencio, iniciar activa audio, salir a Inicio conserva la reproducción y el panel de Android muestra el control multimedia. Lectura nativa durante segundo plano: `AudioControlsService` en primer plano, tipo `0x00000002`, MediaSession `PLAYING` y señal de audio presente.
 - Al vencer sin regresar a la app desaparecen la sesión multimedia y la notificación del servicio; el último segundo de la salida de audio tiene pico y RMS cero. Volver muestra `00:00` y «SESIÓN COMPLETADA», sin reiniciar el ambiente. No se sustituye con esto la prueba en teléfonos físicos de Android e iOS, llamadas, cambios de salida o suspensión prolongada.
 - Grabación conservada en `store/review/background-audio-1.6.0.mp4` y enviada como evidencia de la declaración FGS. Emulador, visor y sink privados cerrados al terminar.
+
+## Confirmación funcional del usuario (2026-10-15)
+
+El usuario confirma «Funciona perfecta» y solicita la publicación en producción. La confirmación no detalla dispositivo, plataforma ni escenarios concretos; el estado de publicación se registra en `store/RELEASE-STATUS.md`.
